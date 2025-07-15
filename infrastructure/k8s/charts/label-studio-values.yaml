@@ -1,0 +1,26 @@
+global:
+  persistence:
+    enabled: true
+    type: s3
+    config:
+      s3:
+        endpointUrl: "http://192.168.5.185:9000"
+        # Use Kubernetes secret for credentials
+        accessKeyExistingSecret: label-studio-s3-credentials
+        accessKeyExistingSecretKey: "access_key"
+        secretKeyExistingSecret: label-studio-s3-credentials
+        secretKeyExistingSecretKey: "secret_key"
+        bucket: "label-studio-data"
+        region: "us-east-1"  # MinIO region (can be any value)
+        folder: ""
+  extraEnvironmentVars:
+    LABEL_STUDIO_HOST: "labelstudio.local:30080" # needed for local development to match the ingress host
+app:
+  ingress:
+    enabled: true
+    host: labelstudio.local
+    className: nginx
+
+  service:
+    type: ClusterIP
+    port: 80

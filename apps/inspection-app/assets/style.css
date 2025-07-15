@@ -1,0 +1,119 @@
+.captured-frame {
+    border: 5px dashed #4CAF50; 
+    border-radius: 5px; 
+}
+
+.result-frame {
+    border: 5px dashed #4CAF50; 
+    border-radius: 5px; 
+}
+
+@keyframes captureFlash {
+    0% {
+        background-color: rgba(255, 255, 255, 1);
+        transform: scale(1.1);
+    }
+    50% {
+        background-color: rgba(76, 175, 80, 0.3);
+    }
+    100% {
+        background-color: rgba(255, 255, 255, 0.8);
+        transform: scale(1);
+    }
+}
+
+@keyframes validateFlash {
+    0% {
+        background-color: rgba(255, 255, 255, 1);
+        transform: scale(1.1);
+    }
+    50% {
+        background-color: rgba(255, 193, 7, 0.3);
+    }
+    100% {
+        background-color: rgba(255, 193, 7, 0.8);
+        transform: scale(1);
+    }
+}
+
+@keyframes classifyFlash {
+    0% {
+        background-color: rgba(255, 255, 255, 1);
+        transform: scale(1.1);
+    }
+    50% {
+        background-color: rgba(0, 123, 255, 0.3);
+    }
+    100% {
+        background-color: rgba(0, 123, 255, 0.8);
+        transform: scale(1);
+    }
+}
+
+@keyframes submitDataFlash {
+    0% {
+        background-color: rgba(255, 255, 255, 1);
+        transform: scale(1.1);
+    }
+    50% {
+        background-color: rgba(0, 123, 255, 0.3);
+    }
+    100% {
+        background-color: rgba(0, 123, 255, 0.8);
+        transform: scale(1);
+    }
+}
+
+.video-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.action-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 512px;
+    height: 512px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.overlay-capture {
+    background-color: rgba(76, 175, 80, 0.8);
+    animation: captureFlash 0.5s ease-out;
+}
+
+.overlay-validate {
+    background-color: rgba(255, 193, 7, 0.8);
+    animation: validateFlash 0.5s ease-out;
+}
+
+.overlay-classify {
+    background-color: rgba(0, 123, 255, 0.8);
+    animation: classifyFlash 0.5s ease-out;
+}
+
+.overlay-submit-data {
+    background-color: rgba(0, 123, 255, 0.8);
+    animation: submitDataFlash 0.5s ease-out;
+}
+
+.video-element {
+    width: 512px;
+    height: 512px;
+    object-fit: cover;
+}
+
+.canvas-hidden {
+    display: none;
+}
+
+.Select-menu {
+    background-color: gray;
+    color: white;
+}
