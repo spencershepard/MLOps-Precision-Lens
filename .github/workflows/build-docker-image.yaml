@@ -1,4 +1,6 @@
 # Reusable Action
+## Permission issues?? Check repository Actions settings for write permission
+
 name: Build Docker Image
 on:
   workflow_call:

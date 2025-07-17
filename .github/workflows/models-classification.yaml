@@ -13,11 +13,6 @@ jobs:
       image_name: "classifier-train"
       dockerfile_path: "./models/classification/Dockerfile.train"
       context_path: "./models/classification"
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-      id-token: write
       
   build-predict-image:
     uses: ./.github/workflows/build-docker-image.yaml
@@ -25,8 +20,3 @@ jobs:
       image_name: "classifier-predict"
       dockerfile_path: "./models/classification/Dockerfile.predict"
       context_path: "./models/classification"
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-      id-token: write
