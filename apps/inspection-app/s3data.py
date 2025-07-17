@@ -6,13 +6,14 @@ import base64
 
 dotenv.load_dotenv()
 
-# directory structure will be like:
-# bucket > train 
-#           > good
-#        > test
-#           > good (optional)
-#           > bad1
-#           > bad2
+## Directory structure:
+# bucket/
+#   main_category/
+#     train/
+#       good/
+#     test/
+#       good/
+#       anomaly_category/
 
 
 def get_directories(bucket_name):

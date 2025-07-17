@@ -1,19 +1,22 @@
-from skimage.io import imread
-from skimage.transform import resize
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import GridSearchCV
-from sklearn.svm import SVC
-from sklearn.metrics import classification_report, confusion_matrix
-import numpy as np
 import os
 import pickle
+
 import boto3
-from dotenv import load_dotenv
+import matplotlib.pyplot as plt
 import mlflow
+import numpy as np
+import seaborn as sns
+from dotenv import load_dotenv
+from skimage.io import imread
+from skimage.transform import resize
+from sklearn.metrics import (accuracy_score, classification_report, 
+                           confusion_matrix, precision_recall_fscore_support)
+from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.svm import SVC
+
+print("Loading environment variables...")
 
 load_dotenv()
-
-CLASS_TRAINING_IMG_LIMIT = 5  # Limit for training images per class
 
 ACCESS_KEY = os.getenv('ACCESS_KEY_ID')
 SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
@@ -21,11 +24,13 @@ BUCKET_NAME = os.getenv('BUCKET_NAME')
 if not BUCKET_NAME or not ACCESS_KEY or not SECRET_ACCESS_KEY:
     raise ValueError("Please set the BUCKET_NAME, ACCESS_KEY_ID, and SECRET_ACCESS_KEY in the .env file.")
 MLFLOW_URI = os.getenv('MLFLOW_URI')
+CLASS_TRAINING_IMG_LIMIT= int(os.getenv("CLASS_TRAINING_IMG_LIMIT", 100))
 
 cache_dir = "s3cache"
 if not os.path.exists(cache_dir):
     os.makedirs(cache_dir)
 
+print("Setting up MLflow tracking...")
 mlflow.set_tracking_uri(MLFLOW_URI)
 mlflow.set_experiment("image-classification-s3")
 
@@ -60,6 +65,7 @@ def get_training_images_from_s3(bucket_name):
             category = key.split('/')[2]  # This should be 'good' or other categories
             if category == 'good':
                 if labels.count(class_name) >= CLASS_TRAINING_IMG_LIMIT:
+                    print(f"Skipping {class_name} as it has reached the training limit.")
                     continue
 
                 local_image_path = os.path.join(cache_dir, key.replace('/', '_'))
@@ -149,7 +155,6 @@ def evaluate_model(classifier, x_test, y_test, labels):
     y_pred = classifier.predict(x_test)
     
     # Calculate metrics
-    from sklearn.metrics import accuracy_score, precision_recall_fscore_support
     accuracy = accuracy_score(y_test, y_pred)
     precision, recall, f1, support = precision_recall_fscore_support(y_test, y_pred, average='weighted')
     
@@ -171,8 +176,6 @@ def evaluate_model(classifier, x_test, y_test, labels):
     
     # Log confusion matrix as artifact
     cm = confusion_matrix(y_test, y_pred)
-    import matplotlib.pyplot as plt
-    import seaborn as sns
     
     plt.figure(figsize=(8, 6))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
@@ -212,6 +215,8 @@ def predict_image(classifier, image_path):
 
 
 
+print("Starting image classification training...")
+
 with mlflow.start_run(run_name="image_classification_training") as run:
     mlflow.sklearn.autolog()
     
@@ -245,6 +250,7 @@ with mlflow.start_run(run_name="image_classification_training") as run:
     )
     
     # Save and log additional artifacts
+    print("Saving and logging the best classifier model...")
     model_path = os.path.join(cache_dir, "best_classifier.pkl")
     pickle.dump(best_classifier, open(model_path, "wb"))
     mlflow.log_artifact(model_path)

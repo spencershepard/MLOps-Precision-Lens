@@ -1,0 +1,22 @@
+name: Build Classifier Images
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'models/classification/**'
+
+jobs:
+  build-train-image:
+    uses: ./.github/workflows/build-docker-image.yaml
+    with:
+      image_name: "classifier-train"
+      dockerfile_path: "./models/classification/Dockerfile.train"
+      context_path: "./models/classification"
+      
+  build-predict-image:
+    uses: ./.github/workflows/build-docker-image.yaml
+    with:
+      image_name: "classifier-predict"
+      dockerfile_path: "./models/classification/Dockerfile.predict"
+      context_path: "./models/classification"
