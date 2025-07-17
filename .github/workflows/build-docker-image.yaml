@@ -19,7 +19,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
+
+      - name: Get Docker-safe metadata (lowercase)
+        id: docker-metadata
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository }}
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         
@@ -36,8 +42,7 @@ jobs:
           context: ${{ inputs.context_path }}
           file: ${{ inputs.dockerfile_path }}
           push: true
-          tags: |
-            ghcr.io/${{ github.repository }}/${{ inputs.image_name }}:latest
-            ghcr.io/${{ github.repository }}/${{ inputs.image_name }}:${{ github.sha }}
+          tags: ${{ steps.docker-metadata.outputs.tags }}
+          labels: ${{ steps.docker-metadata.outputs.labels }}
           cache-from: type=gha,scope=${{ inputs.image_name }}
           cache-to: type=gha,mode=max,scope=${{ inputs.image_name }}
