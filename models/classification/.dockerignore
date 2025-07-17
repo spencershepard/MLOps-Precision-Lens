@@ -1,0 +1,5 @@
+s3_cache
+mlruns
+.venv
+__pycache__
+*.env

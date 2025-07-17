@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 load_dotenv()
 app = FastAPI()
 
+print("Starting model prediction service...")
 MLFLOW_URI = os.getenv("MLFLOW_URI")
 if not MLFLOW_URI:
     raise ValueError("MLFLOW_URI environment variable is not set.")
