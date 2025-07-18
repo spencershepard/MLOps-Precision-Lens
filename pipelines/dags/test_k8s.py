@@ -19,6 +19,7 @@ dag = DAG(
 )
 
 test_k8s = KubernetesPodOperator(
+    task_id='test_k8s_task',
     name='test-pod',
     namespace='default',
     image='busybox:latest',

@@ -20,5 +20,6 @@ with DAG(
         env_from=[
             {"configMapRef": {"name": "pl-config"}},
             {"secretRef": {"name": "pl-secrets"}}
-        ]
+        ],
+        image_pull_policy="Always", # temporary 
     )
