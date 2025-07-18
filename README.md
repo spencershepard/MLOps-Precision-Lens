@@ -27,7 +27,7 @@ flowchart TD
 - **MLflow Tracking** 📊: Logs experiments, models, and metrics using MLflow.
 - **Operator Web App** 🖥️: Provides a simple web interface for production line operators to inspect parts with the anomaly detection system, as well as capturing new data for retraining.
 
-![Web App](apps\inspection-app\docs\live-feed.png)
+![Web App](apps/inspection-app/docs/live-feed.png)
 
 ## Upcoming Features 🚀
 - **Human-in-the-loop** 👥: Integrate human feedback to confirm data quality and labeling.
