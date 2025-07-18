@@ -54,8 +54,9 @@ flowchart TD
     cd MLOps-Precision-Lens
     cp secrets.env.example secrets.env
     ```
-2. **Configure your secrets**:
+2. **Configure your secrets/config**:
    - Update `secrets.env` with your AWS credentials and other necessary secrets.
+   - Update `config.env` with your desired configuration settings.
 
 3. **Deploy the infrastructure**:
    - Navigate to the `infrastructure/terraform` directory.
@@ -65,8 +66,14 @@ flowchart TD
      terraform apply
      ```
 
-4. **Setup Hostname**:
+4. **Setup Hostnames**:
    - Update your `/etc/hosts` on linux, or run [infrastructure\scripts\setup-local-domains.ps1](infrastructure/scripts/setup-local-domains.ps1) on Windows.
 
 ## Access the Application
-Once the infrastructure is deployed and the hostname is set up, you can access the application at `http://precision-lens.local` in your web browser.
+Once the infrastructure is deployed and the hostname is set up, you can access the application at:
+
+http://precision-lens.local
+
+- MLFlow UI: http://mlflow.local
+- Airflow UI: http://airflow.local default credentials are `admin/admin`.
+- Grafana UI: http://grafana.local with the default credentials `admin/promoperator`.

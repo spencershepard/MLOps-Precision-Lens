@@ -30,7 +30,7 @@ cache_dir = "s3cache"
 if not os.path.exists(cache_dir):
     os.makedirs(cache_dir)
 
-print("Setting up MLflow tracking...")
+print(f"Setting up MLflow tracking with URI: {MLFLOW_URI}")
 mlflow.set_tracking_uri(MLFLOW_URI)
 mlflow.set_experiment("image-classification-s3")
 
