@@ -9,7 +9,8 @@ with DAG(
 ) as dag:
 
     train_model = KubernetesPodOperator(
-        name="ml-training-job",
+        task_id="train_classifier_task",
+        name="classifier-training-job",
         namespace="default",
         image="ghcr.io/spencershepard/mlops-precision-lens/classifier-train:develop", 
         get_logs=True,
