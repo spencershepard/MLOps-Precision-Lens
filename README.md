@@ -38,3 +38,35 @@ flowchart TD
 - **pipelines/**: Contains the ML pipelines for automated training. (Apache Airflow))
 
 **See the project folders for additional details and documentation on each component.**
+
+## Getting Started
+
+### Prerequisites
+- A Kubernetes cluster
+- kubectl command-line tool
+- Helm package manager
+- Terraform command-line tool
+
+### Local Setup Instructions
+1. **Clone the repository**:
+    ```bash
+    git clone https://github.com/spencershepard/MLOps-Precision-Lens.git
+    cd MLOps-Precision-Lens
+    cp secrets.env.example secrets.env
+    ```
+2. **Configure your secrets**:
+   - Update `secrets.env` with your AWS credentials and other necessary secrets.
+
+3. **Deploy the infrastructure**:
+   - Navigate to the `infrastructure/terraform` directory.
+   - Run the following command to deploy the infrastructure:
+     ```bash
+     terraform init
+     terraform apply
+     ```
+
+4. **Setup Hostname**:
+   - Update your `/etc/hosts` on linux, or run [infrastructure\scripts\setup-local-domains.ps1](infrastructure/scripts/setup-local-domains.ps1) on Windows.
+
+## Access the Application
+Once the infrastructure is deployed and the hostname is set up, you can access the application at `http://precision-lens.local` in your web browser.

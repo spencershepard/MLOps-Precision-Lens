@@ -11,6 +11,7 @@ $entries = @(
     "127.0.0.1 airflow.local",
     "127.0.0.1 classification-api.local",
     "127.0.0.1 anomaly-detection.local",
+    "127.0.0.1 precision-lens.local",
     "127.0.0.1 api.local"
 )
 

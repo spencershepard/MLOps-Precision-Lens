@@ -19,8 +19,8 @@ dotenv.load_dotenv()
 def get_directories(bucket_name):
     s3 = boto3.client('s3', 
                      region_name=os.getenv('AWS_REGION'),
-                     aws_access_key_id=os.getenv('ACCESS_KEY'), 
-                     aws_secret_access_key=os.getenv('SECRET_ACCESS_KEY'))
+                     aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'), 
+                     aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'))
 
     paginator = s3.get_paginator('list_objects_v2')
     directories = []
@@ -38,8 +38,8 @@ def get_dataset_structure(bucket_name):
     """Get the complete dataset structure from S3 bucket."""
     s3 = boto3.client('s3', 
                      region_name=os.getenv('AWS_REGION'),
-                     aws_access_key_id=os.getenv('ACCESS_KEY'), 
-                     aws_secret_access_key=os.getenv('SECRET_ACCESS_KEY'))
+                     aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'), 
+                     aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'))
     
     dataset_structure = {
         'train': {'good': []},
@@ -84,8 +84,8 @@ def download_file_from_s3(bucket_name, s3_key, local_path):
     """Download a file from S3 to local path."""
     s3 = boto3.client('s3', 
                      region_name=os.getenv('AWS_REGION'),
-                     aws_access_key_id=os.getenv('ACCESS_KEY'), 
-                     aws_secret_access_key=os.getenv('SECRET_ACCESS_KEY'))
+                     aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'), 
+                     aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'))
     
     try:
         # Create directory if it doesn't exist
@@ -100,8 +100,8 @@ def upload_data_to_s3(bucket_name, local_path, main_category, split, category, i
     """Upload a file to S3. Image path structure: main_category/split/category/file."""
     s3 = boto3.client('s3', 
                      region_name=os.getenv('AWS_REGION'),
-                     aws_access_key_id=os.getenv('ACCESS_KEY'), 
-                     aws_secret_access_key=os.getenv('SECRET_ACCESS_KEY'))
+                     aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'), 
+                     aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'))
     
     if image_bytes and filename:
         # Handle raw bytes upload

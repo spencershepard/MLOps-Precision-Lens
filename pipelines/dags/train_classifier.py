@@ -17,4 +17,8 @@ with DAG(
         is_delete_operator_pod=True,
         in_cluster=False,  # If Airflow is running inside the cluster, we can use a service account token (requires RBAC setup)
         kubernetes_conn_id="my-cluster", # This needs to be set up in Airflow connections (UI)
+        env_from=[
+            {"configMapRef": {"name": "pl-config"}},
+            {"secretRef": {"name": "pl-secrets"}}
+        ]
     )
