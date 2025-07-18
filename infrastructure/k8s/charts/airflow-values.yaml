@@ -79,10 +79,10 @@ airflowVersion: "3.0.2"
 # Images
 images:
   airflow:
-    repository: ~
-    tag: ~
+    repository: spencershepard/airflow
+    tag: latest
     # Specifying digest takes precedence over tag.
-    digest: ~
+    # digest: ~
     pullPolicy: IfNotPresent
   # To avoid images with user code, you can turn this to 'true' and
   # all the 'run-airflow-migrations' and 'wait-for-airflow-migrations' containers/jobs
@@ -96,12 +96,12 @@ images:
     # can be overridden in `config.kubernetes` section. So for these parameters to have effect
     # `config.kubernetes.worker_container_repository` and `config.kubernetes.worker_container_tag`
     # must be not set .
-    repository: ~
-    tag: ~
+    repository: spencershepard/airflow
+    tag: latest
     pullPolicy: IfNotPresent
   flower:
-    repository: ~
-    tag: ~
+    repository: spencershepard/airflow
+    tag: latest
     pullPolicy: IfNotPresent
   statsd:
     repository: quay.io/prometheus/statsd-exporter
@@ -2960,10 +2960,10 @@ dags:
     # ssh example: git@github.com:apache/airflow.git
     # https example: https://github.com/apache/airflow.git
     repo: https://github.com/spencershepard/MLOps-Precision-Lens.git
-    branch: main
+    branch: develop
     rev: HEAD
     # The git revision (branch, tag, or hash) to check out, v4 only
-    ref: main
+    ref: develop
     depth: 1
     # the number of consecutive failures allowed before aborting
     maxFailures: 0

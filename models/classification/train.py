@@ -18,11 +18,11 @@ print("Loading environment variables...")
 
 load_dotenv()
 
-ACCESS_KEY = os.getenv('ACCESS_KEY_ID')
-SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 BUCKET_NAME = os.getenv('BUCKET_NAME')
-if not BUCKET_NAME or not ACCESS_KEY or not SECRET_ACCESS_KEY:
-    raise ValueError("Please set the BUCKET_NAME, ACCESS_KEY_ID, and SECRET_ACCESS_KEY in the .env file.")
+if not BUCKET_NAME or not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
+    raise ValueError("Please set the BUCKET_NAME, AWS_ACCESS_KEY_ID, and AWS_SECRET_ACCESS_KEY in your environment.")
 MLFLOW_URI = os.getenv('MLFLOW_URI')
 CLASS_TRAINING_IMG_LIMIT= int(os.getenv("CLASS_TRAINING_IMG_LIMIT", 100))
 
@@ -30,7 +30,7 @@ cache_dir = "s3cache"
 if not os.path.exists(cache_dir):
     os.makedirs(cache_dir)
 
-print("Setting up MLflow tracking...")
+print(f"Setting up MLflow tracking with URI: {MLFLOW_URI}")
 mlflow.set_tracking_uri(MLFLOW_URI)
 mlflow.set_experiment("image-classification-s3")
 
@@ -48,8 +48,8 @@ def get_training_images_from_s3(bucket_name):
     """
     print(f"Fetching training images from S3 bucket: {bucket_name}")
     s3 = boto3.client('s3', 
-                     aws_access_key_id=ACCESS_KEY, 
-                     aws_secret_access_key=SECRET_ACCESS_KEY)
+                     aws_access_key_id=AWS_ACCESS_KEY_ID, 
+                     aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
     response = s3.list_objects_v2(Bucket=bucket_name)
     images = []
     labels = []

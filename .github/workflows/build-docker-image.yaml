@@ -47,7 +47,7 @@ jobs:
           context: ${{ inputs.context_path }}
           file: ${{ inputs.dockerfile_path }}
           push: true
-          tags: ${{ steps.docker-metadata.outputs.tags }}${{ inputs.image_tag_suffix && format('-{0}', inputs.image_tag_suffix) || '' }}
+          tags: ${{ steps.docker-metadata.outputs.tags }}
           labels: ${{ steps.docker-metadata.outputs.labels }}
           cache-from: type=gha,scope=${{ inputs.image_name }}
           cache-to: type=gha,mode=max,scope=${{ inputs.image_name }}

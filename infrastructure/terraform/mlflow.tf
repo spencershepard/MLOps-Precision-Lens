@@ -52,6 +52,6 @@ resource "helm_release" "mlflow" {
 
 #debug the rendered values
 
-output "mlflow_values" {
-  value = helm_release.mlflow.values
-}
+# output "mlflow_values" {
+#   value = helm_release.mlflow.values
+# }
