@@ -15,5 +15,6 @@ with DAG(
         image="ghcr.io/spencershepard/mlops-precision-lens/classifier-train:develop", 
         get_logs=True,
         is_delete_operator_pod=True,
-        in_cluster=True,  # If Airflow is running inside the cluster
+        in_cluster=False,  # If Airflow is running inside the cluster, we can use a service account token (requires RBAC setup)
+        kubernetes_conn_id="my-cluster", # This needs to be set up in Airflow connections (UI)
     )

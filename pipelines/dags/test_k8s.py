@@ -25,7 +25,8 @@ test_k8s = KubernetesPodOperator(
     cmds=['echo'],
     arguments=['Hello from Kubernetes!'],
     get_logs=True,
-    is_delete_operator_pod=True,  # Clean up pods after completion
-    in_cluster=True, # If Airflow is running inside the cluster
+    is_delete_operator_pod=True,
+    in_cluster=False,  # If Airflow is running inside the cluster, we can use a service account token (requires RBAC setup)
+    kubernetes_conn_id="my-cluster", # This needs to be set up in Airflow connections (UI)
     dag=dag,
 )
