@@ -13,13 +13,12 @@ dag = DAG(
     'test_k8s_simple',
     default_args=default_args,
     description='Simple Kubernetes connection test',
-    schedule_interval=None,
+    schedule=None,
     catchup=False,
     tags=['kubernetes', 'test'],
 )
 
 test_k8s = KubernetesPodOperator(
-    task_id='test_k8s_connection',
     name='test-pod',
     namespace='default',
     image='busybox:latest',

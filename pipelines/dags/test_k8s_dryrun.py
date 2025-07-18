@@ -6,8 +6,8 @@ k = KubernetesPodOperator(
     cmds=["bash", "-cx"],
     arguments=["echo", "10"],
     labels={"foo": "bar"},
-    task_id="dry_run_demo",
     do_xcom_push=True,
+    in_cluster=True,
 )
 
 k.dry_run()
