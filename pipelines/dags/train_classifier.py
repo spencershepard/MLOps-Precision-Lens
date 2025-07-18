@@ -17,11 +17,10 @@ conn = Connection(
 )
 
 with DAG(
-    dag_id='train_ml_model',  # Renamed to be more generic as it now has multiple triggers
+    dag_id='train_classifier_model',
     start_date=datetime(2025, 1, 1),
-    schedule_interval=None,  # still supports manual triggering
     catchup=False,
-    tags=['ml', 'training'],
+    tags=['ml', 'training', 'classifier'],
     default_args={
         'retries': 1,
         'retry_delay': timedelta(minutes=5),
@@ -30,6 +29,7 @@ with DAG(
 
     # Sensor to detect new data in S3 bucket, waiting for changes to stop before triggering training
     detect_new_data = S3KeysUnchangedSensor(
+        aws_conn_id='my-aws-connection',
         task_id='detect_new_data',
         bucket_name=os.getenv('BUCKET_NAME'),
         bucket_key='*.png',  # pattern based on your data files
