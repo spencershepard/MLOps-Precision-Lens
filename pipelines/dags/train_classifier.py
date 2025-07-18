@@ -5,9 +5,7 @@ from datetime import datetime
 with DAG(
     dag_id='train_classifier',
     start_date=datetime(2025, 1, 1),
-    schedule_interval=None,  # one-time manual trigger
     catchup=False,
-    tags=['ml', 'training'],
 ) as dag:
 
     train_model = KubernetesPodOperator(
