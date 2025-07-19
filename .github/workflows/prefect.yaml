@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'pipelines\flows\Dockerfile'
+      - 'pipelines\flows\**'
 
 jobs:
   build-prefect-image:
