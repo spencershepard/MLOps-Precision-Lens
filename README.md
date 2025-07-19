@@ -71,13 +71,13 @@ flowchart TD
 4. **Setup Hostnames**:
    - Update your `/etc/hosts` on linux, or run [infrastructure\scripts\setup-local-domains.ps1](infrastructure/scripts/setup-local-domains.ps1) on Windows.
 
-5. **Add the first model**
+5. **Setup Prefect**:
+   - In the Prefect UI, create a new block for your Kubenetes config.
+   - Add the new block to 'my-pool' in the Prefect UI under Work Pools.
+
+6. **Add the first model**
    In MLFLow, create a new model for each product/part class you want to detect anomalies for. 
 
-6. **Add Airflow Connections**:
-   - In the Airflow UI, navigate to Admin -> Connections.
-   - Add a Kubernetes connection called 'my-cluster'
-   - Add an AWS connection called 'my-aws'
 
 ## Access the Application
 Once the infrastructure is deployed and the hostname is set up, you can access the application at:
