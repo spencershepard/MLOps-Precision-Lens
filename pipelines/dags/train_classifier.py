@@ -16,14 +16,17 @@ conn = Connection(
     },
 )
 
+conn_uri = conn.get_uri()
+print(f"Using AWS connection URI: {conn_uri}")
+
 with DAG(
     dag_id='train_classifier_model',
     start_date=datetime(2025, 1, 1),
     catchup=False,
-    tags=['ml', 'training', 'classifier'],
+    tags=['ml', 'training', 'classifier', 's3-trigger'],
     default_args={
         'retries': 1,
-        'retry_delay': timedelta(minutes=5),
+        'retry_delay': 120,
     }
 ) as dag:
 
