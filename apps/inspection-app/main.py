@@ -16,8 +16,7 @@ import requests
 load_figure_template("darkly")
 
 server = Flask(__name__) 
-app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.DARKLY])
-
+app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.DARKLY], title="Precision Lens")
 
 app.layout = html.Div([
     dbc.Container( children=[

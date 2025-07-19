@@ -23,7 +23,7 @@ def deploy_classifier_training_flow():
     deployment = s3_monitor_flow.deploy(
         name="s3-triggered-classifier-training",
         work_pool_name="my-pool",
-        image="ghcr.io/spencershepard/mlops-precision-lens/prefect:latest",
+        image="ghcr.io/spencershepard/mlops-precision-lens/prefect:develop",
         cron="0 * * * *",  # Run every hour
         build=True,  # Build from existing Dockerfile in the current directory
         tags=["s3", "monitoring", "ml", "classifier-training"],
