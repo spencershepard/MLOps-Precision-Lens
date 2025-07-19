@@ -1,0 +1,15 @@
+name: Build Prefect Image
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'pipelines\flows\Dockerfile'
+
+jobs:
+  build-prefect-image:
+    uses: ./.github/workflows/build-docker-image.yaml
+    with:
+      image_name: "prefect"
+      dockerfile_path: "./pipelines/flows/Dockerfile"
+      context_path: "./pipelines/flows/"
