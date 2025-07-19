@@ -1,3 +1,6 @@
+import dotenv
+dotenv.load_dotenv()
+
 from flask import Flask, request, jsonify
 import dash
 from dash import html, dcc, callback, Input, Output
@@ -8,9 +11,6 @@ import s3data
 import time
 import os
 import requests 
-import dotenv
-
-dotenv.load_dotenv()
 
 # loads the "darkly" template and sets it as the default
 load_figure_template("darkly")
@@ -113,7 +113,7 @@ def show_validation_result_panel():
 )
 def update_model_choices(_):
     """Update model choices whenever the page loads"""
-    return models.get_model_choices("name LIKE '%Anomaly'")
+    return models.get_model_choices("name LIKE '%Quality%'")
 
 @callback(
     [Output("capture-panel", "style"),
