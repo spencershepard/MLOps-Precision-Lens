@@ -64,6 +64,12 @@ variable "airflow_domain" {
   default     = "airflow.local"
 }
 
+variable "prefect_domain" {
+  type        = string
+  description = "Domain name for Prefect in production (e.g., prefect.company.com)"
+  default     = "prefect.local"
+}
+
 variable "label_studio_access_key" {
   type        = string
   description = "Access key for Label Studio S3"
