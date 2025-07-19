@@ -74,6 +74,11 @@ flowchart TD
 5. **Add the first model**
    In MLFLow, create a new model for each product/part class you want to detect anomalies for. 
 
+6. **Add Airflow Connections**:
+   - In the Airflow UI, navigate to Admin -> Connections.
+   - Add a Kubernetes connection called 'my-cluster'
+   - Add an AWS connection called 'my-aws'
+
 ## Access the Application
 Once the infrastructure is deployed and the hostname is set up, you can access the application at:
 

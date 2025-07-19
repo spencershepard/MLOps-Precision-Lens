@@ -5,20 +5,6 @@ from datetime import datetime, timedelta
 import os
 from airflow.models.connection import Connection
 
-
-conn = Connection(
-    conn_id="my-aws-connection",
-    conn_type="aws",
-    login=os.getenv("AWS_ACCESS_KEY_ID"),  # Reference to AWS Access Key ID
-    password=os.getenv("AWS_SECRET_ACCESS_KEY"),  # Reference to AWS Secret Access Key
-    extra={
-        "region_name": os.getenv("AWS_REGION"),
-    },
-)
-
-conn_uri = conn.get_uri()
-print(f"Using AWS connection URI: {conn_uri}")
-
 with DAG(
     dag_id='train_classifier_model',
     start_date=datetime(2025, 1, 1),
@@ -33,7 +19,7 @@ with DAG(
     # Sensor to detect new data in S3 bucket, waiting for changes to stop before triggering training
     detect_new_data = S3KeySensor(
         task_id='detect_new_data',
-        aws_conn_id='my-aws-connection',
+        aws_conn_id='my-aws',
         bucket_name=os.getenv('BUCKET_NAME'),
         bucket_key='*.png',  # pattern based on your data files
         wildcard_match=True,  # Enable wildcard matching for detecting multiple files
