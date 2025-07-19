@@ -82,8 +82,8 @@ flowchart TD
 ## Access the Application
 Once the infrastructure is deployed and the hostname is set up, you can access the application at:
 
-http://precision-lens.local
+http://precision-lens.local:30080
 
-- MLFlow UI: http://mlflow.local
-- Airflow UI: http://airflow.local default credentials are `admin/admin`.
-- Grafana UI: http://grafana.local with the default credentials `admin/promoperator`.
+- MLFlow UI: http://mlflow.local:30080
+- Airflow UI: http://airflow.local:30080 default credentials are `admin/admin`.
+- Grafana UI: http://grafana.local:30080 with the default credentials `admin/promoperator`.
