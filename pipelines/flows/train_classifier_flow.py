@@ -6,6 +6,8 @@ import dotenv
 import base64
 import yaml
 
+os.environ.setdefault("PREFECT_LOGGING_LEVEL", "INFO")
+
 local_development = not os.getenv("PREFECT_API_URL")
 if local_development:
     print("Running in local development mode.")
@@ -118,31 +120,24 @@ def trigger_k8s_job(s3_key: str):
     batch.create_namespaced_job(namespace="default", body=job_spec)
     logger.info(f"Created Kubernetes job: {job_name}")
 
-@flow(name="s3-monitor-flow")
+@task
+def test_logging():
+    logger = get_run_logger()
+    logger.info("This is an info log message")
+    logger.warning("This is a warning log message")
+    logger.error("This is an error log message")
+    logger.debug("This is a debug log message")
+
+@flow(name="s3-monitor-flow", log_prints=True)
 def s3_monitor_flow():
     logger = get_run_logger()
     get_env_vars()
+    test_logging()
     # new_keys = list_new_s3_keys()
     # if new_keys:
     #     trigger_k8s_job(new_keys[0])
     logger.info("Starting S3 monitor flow")
     trigger_k8s_job("example-s3-key")
 
-def create_deployment():
-    """Create and deploy the flow to the Prefect server"""
-    deployment = s3_monitor_flow.deploy(
-        name="s3-triggered-classifier-training",
-        work_pool_name="my-pool",
-        image="your-registry/mlops-precision-lens:latest",
-        cron="0 * * * *",
-        tags=["s3", "monitoring", "ml"],
-    )
-    print(f"Deployment created: {deployment}")
-    return deployment
-
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) > 1 and sys.argv[1] == "deploy":
-        create_deployment()
-    else:
-        s3_monitor_flow()
+    s3_monitor_flow()
