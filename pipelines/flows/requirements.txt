@@ -57,12 +57,15 @@ markdown-it-py==3.0.0
 MarkupSafe==3.0.2
 mdurl==0.1.2
 multidict==6.6.3
+mypy-boto3-s3==1.39.5
+mypy-boto3-secretsmanager==1.39.0
 oauthlib==3.3.1
 opentelemetry-api==1.35.0
 orjson==3.11.0
 packaging==25.0
 pathspec==0.12.1
 prefect==3.4.9
+prefect-aws==0.5.12
 prefect-kubernetes==0.6.1
 prometheus_client==0.22.1
 propcache==0.3.2
@@ -75,6 +78,7 @@ pydantic-settings==2.10.1
 pydantic_core==2.33.2
 Pygments==2.19.2
 pyOpenSSL==25.1.0
+pyparsing==3.2.3
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
 python-json-logger==3.3.0
