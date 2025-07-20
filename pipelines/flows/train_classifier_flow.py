@@ -27,11 +27,17 @@ from prefect import flow, task, get_run_logger
 from prefect.settings import PREFECT_API_URL
 print(f"PREFECT_API_URL setting: {PREFECT_API_URL.value()}")
 
-# AWS credentials and bucket configuration
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-BUCKET_NAME = os.getenv("BUCKET_NAME")
-AWS_REGION = os.getenv("AWS_REGION")
+from prefect_aws import AwsCredentials
+from prefect_aws.s3 import S3Bucket
+
+aws_credentials_block = AwsCredentials.load("my-aws")
+s3_bucket = S3Bucket.load("my-s3")
+
+# AWS credentials and bucket configuration.
+AWS_ACCESS_KEY_ID = aws_credentials_block.aws_access_key_id
+AWS_SECRET_ACCESS_KEY = aws_credentials_block.aws_secret_access_key
+BUCKET_NAME = s3_bucket.bucket_name
+AWS_REGION = s3_bucket.region
 
 PREFIX = ""
 
@@ -127,6 +133,7 @@ def test_logging():
     logger.warning("This is a warning log message")
     logger.error("This is an error log message")
     logger.debug("This is a debug log message")
+    print("This is a print statement, not a log message")
 
 @flow(name="s3-monitor-flow", log_prints=True)
 def s3_monitor_flow():

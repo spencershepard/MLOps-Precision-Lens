@@ -74,6 +74,8 @@ flowchart TD
 5. **Setup Prefect**:
    - In the Prefect UI, create a new block for your Kubenetes config.
    - Add the new block to 'my-pool' in the Prefect UI under Work Pools.
+   - Create an AWS credentials block in Prefect with the name `my-aws`. 
+   - Finally, create an S3 block called `my-s3` and link it to the AWS credentials block.
 
 6. **Add the first model**
    In MLFLow, create a new model for each product/part class you want to detect anomalies for. 
@@ -85,5 +87,5 @@ Once the infrastructure is deployed and the hostname is set up, you can access t
 http://precision-lens.local:30080
 
 - MLFlow UI: http://mlflow.local:30080
-- Airflow UI: http://airflow.local:30080 default credentials are `admin/admin`.
+- Prefect UI: http://prefect.local:30080
 - Grafana UI: http://grafana.local:30080 with the default credentials `admin/promoperator`.
