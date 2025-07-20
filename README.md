@@ -74,6 +74,7 @@ flowchart TD
 5. **Setup Prefect**:
    - In the Prefect UI, create a new block for your Kubenetes config.
    - Add the new block to 'my-pool' in the Prefect UI under Work Pools.
+   - Create a Kubernetes Credentials block called `my-k8s-creds` and link it to the Kubernetes config block you created.
    - Create an AWS credentials block in Prefect with the name `my-aws`. 
    - Finally, create an S3 block called `my-s3` and link it to the AWS credentials block.
 

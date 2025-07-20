@@ -19,14 +19,17 @@ if local_development:
 def deploy_classifier_training_flow():
     """Deploy the S3 monitor training flow to Prefect server"""
     print("Deploying S3 monitor training flow...")
+
+    #docker pull ghcr.io/spencershepard/mlops-precision-lens/prefect@sha256:9f383e3d3791ea7850df88f36eb74f5a7fac367e8dee7606c50320a66d528786
     
     deployment = s3_monitor_flow.deploy(
         name="s3-triggered-classifier-training",
         work_pool_name="my-pool",
         image="ghcr.io/spencershepard/mlops-precision-lens/prefect:develop",
-        cron="0 * * * *",  # Run every hour
+        cron="0 */2 * * *",  # Run every 2 mins
         build=False,  # Build from existing Dockerfile in the current directory
         tags=["s3", "monitoring", "ml", "classifier-training"],
+        concurrency_limit=1,
         description="Monitors S3 for new data and triggers ML classifier training jobs"
     )
     
