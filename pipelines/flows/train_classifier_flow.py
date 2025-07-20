@@ -37,12 +37,12 @@ s3_bucket = S3Bucket.load("my-s3")
 AWS_ACCESS_KEY_ID = aws_credentials_block.aws_access_key_id
 AWS_SECRET_ACCESS_KEY = aws_credentials_block.aws_secret_access_key
 BUCKET_NAME = s3_bucket.bucket_name
-AWS_REGION = s3_bucket.region
+AWS_REGION = aws_credentials_block.region_name
 
 PREFIX = ""
 
-if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
-    raise ValueError("AWS credentials are not set in environment variables.")
+# if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
+#     raise ValueError("AWS credentials are not set in environment variables.")
 
 @task
 def get_env_vars():
