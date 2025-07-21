@@ -1,22 +1,11 @@
 import os
 import dotenv
 from train_classifier_flow import s3_monitor_flow
+import sys
 
-# Set up environment variables
-in_cluster = os.getenv("KUBERNETES_SERVICE_HOST")
-if not in_cluster:
-    print("Running deployment in local mode.")
-    if not os.getenv("PREFECT_API_URL"):
-        print("PREFECT_API_URL not set in local environment, using default.")
-        os.environ["PREFECT_API_URL"] = "http://prefect.local:30080/api"
-    # Load environment variables from .env files
-    secrets_path = "../../secrets.env"
-    config_path = "../../config.env"
-    if os.path.exists(secrets_path) and os.path.exists(config_path):
-        dotenv.load_dotenv(secrets_path)
-        dotenv.load_dotenv(config_path)
-    else:
-        print(f"Warning: {secrets_path} or {config_path} not found. Environment variables may not be set correctly.")
+# Provide the Prefect API URL if needed (ie. local development)
+if len(sys.argv) > 1:
+    os.environ["PREFECT_API_URL"] = sys.argv[1]
 
 def deploy_classifier_training_flow():
     """Deploy the S3 monitor training flow to Prefect server"""
