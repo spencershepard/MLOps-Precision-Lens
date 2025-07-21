@@ -77,3 +77,41 @@ resource "helm_release" "prefect-worker" {
   }]
 }
 
+# Create a one-time Kubernetes job to run our deployment script with our custom image
+resource "kubernetes_job" "create_deployment" {
+  depends_on = [ 
+    helm_release.prefect-server,
+    helm_release.prefect-worker,
+    kubernetes_namespace.prefect
+  ]
+  metadata {
+    name      = "deploy-script"
+    namespace = kubernetes_namespace.prefect.metadata[0].name
+  }
+
+  spec {
+    template {
+      metadata {
+        labels = {
+          app = "deploy-script"
+        }
+      }
+      spec {
+        container {
+          name  = "deploy-script"
+          image = "ghcr.io/spencershepard/mlops-precision-lens/prefect:develop"
+          command = [
+            "/bin/sh",
+            "-c",
+            "python /app/deploy_flows.py"
+          ]
+          env {
+            name  = "PREFECT_API_URL"
+            value = "http://prefect-server.prefect.svc.cluster.local:4200/api"
+          }
+        }
+        restart_policy = "OnFailure"
+      }
+    }
+  }
+}

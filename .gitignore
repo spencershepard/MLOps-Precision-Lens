@@ -1,2 +1,4 @@
 *.env
 s3cache/
+*.pyc
+__pycache__/

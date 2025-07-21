@@ -70,6 +70,12 @@ variable "prefect_domain" {
   default     = "prefect.local"
 }
 
+variable "pl_app_domain" {
+  type        = string
+  description = "Domain name for Precision Lens app in production (e.g., pl.company.com)"
+  default     = "precision-lens.local"
+}
+
 variable "label_studio_access_key" {
   type        = string
   description = "Access key for Label Studio S3"
