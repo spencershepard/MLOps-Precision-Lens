@@ -1,4 +1,4 @@
-name: Build Classifier Images
+name: Build Classifier Image
 on:
   workflow_dispatch:
   push:
