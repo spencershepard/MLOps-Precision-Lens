@@ -1,0 +1,15 @@
+name: Build App Image
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/inspection-app/**'
+
+jobs:
+  build-prefect-image:
+    uses: ./.github/workflows/build-docker-image.yaml
+    with:
+      image_name: "precision-lens"
+      dockerfile_path: "./apps/inspection-app/Dockerfile"
+      context_path: "./apps/inspection-app/"
