@@ -14,15 +14,6 @@ local_development = not os.getenv("PREFECT_API_URL")
 if local_development:
     print("Running in local development mode.")
     os.environ["PREFECT_API_URL"] = "http://prefect.local:30080/api"
-    print("PREFECT_API_URL not set in local environment, using default.")
-    # Load environment variables from .env files
-    secrets_path = "../../secrets.env"
-    config_path = "../../config.env"
-    if os.path.exists(secrets_path) and os.path.exists(config_path):
-        dotenv.load_dotenv(secrets_path)
-        dotenv.load_dotenv(config_path)
-    else:
-        print(f"Warning: {secrets_path} or {config_path} not found. Environment variables may not be set correctly.")
 
 # Load Prefect after setting the environment variable
 from prefect import flow, task, get_run_logger
@@ -95,8 +86,8 @@ def trigger_k8s_job(s3_key: str):
                     "containers": [
                         {
                             "name": "processor",
-                            "image": "ghcr.io/spencershepard/mlops-precision-lens/classifier-train:develop",
-                            #"args": ["bash", "-c", "echo Hello World"], #ie override Dockerfile CMD
+                            "image": "ghcr.io/spencershepard/mlops-precision-lens/classifier:develop",
+                            "args": ["python", "-u", "train.py"], #ie override Dockerfile CMD
                             #"command": ["python", "train_classifier.py"], #ie override Dockerfile ENTRYPOINT
                             "env": [
                                 {
