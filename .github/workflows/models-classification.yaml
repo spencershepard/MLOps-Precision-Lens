@@ -7,18 +7,11 @@ on:
       - 'models/classification/**'
 
 jobs:
-  build-train-image:
+  build-classifier-image:
     uses: ./.github/workflows/build-docker-image.yaml
     with:
-      image_name: "classifier-train"
-      dockerfile_path: "./models/classification/Dockerfile.train"
+      image_name: "classifier"
+      dockerfile_path: "./models/classification/Dockerfile"
       context_path: "./models/classification"
-      image_tag_suffix: "classifier-train"
+      image_tag_suffix: "classifier"
       
-  build-predict-image:
-    uses: ./.github/workflows/build-docker-image.yaml
-    with:
-      image_name: "classifier-predict"
-      dockerfile_path: "./models/classification/Dockerfile.predict"
-      context_path: "./models/classification"
-      image_tag_suffix: "classifier-predict"
