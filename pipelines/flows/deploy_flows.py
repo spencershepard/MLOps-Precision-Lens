@@ -2,11 +2,13 @@ import os
 import dotenv
 from train_classifier_flow import s3_monitor_flow
 
-# Load environment variables for deployment
-local_development = not os.getenv("PREFECT_API_URL")
-if local_development:
-    print("Running deployment in local development mode.")
-    os.environ["PREFECT_API_URL"] = "http://prefect.local:30080/api"
+# Set up environment variables
+in_cluster = os.getenv("KUBERNETES_SERVICE_HOST")
+if not in_cluster:
+    print("Running deployment in local mode.")
+    if not os.getenv("PREFECT_API_URL"):
+        print("PREFECT_API_URL not set in local environment, using default.")
+        os.environ["PREFECT_API_URL"] = "http://prefect.local:30080/api"
     # Load environment variables from .env files
     secrets_path = "../../secrets.env"
     config_path = "../../config.env"
@@ -20,14 +22,12 @@ def deploy_classifier_training_flow():
     """Deploy the S3 monitor training flow to Prefect server"""
     print("Deploying S3 monitor training flow...")
 
-    #docker pull ghcr.io/spencershepard/mlops-precision-lens/prefect@sha256:9f383e3d3791ea7850df88f36eb74f5a7fac367e8dee7606c50320a66d528786
-    
     deployment = s3_monitor_flow.deploy(
         name="s3-triggered-classifier-training",
         work_pool_name="my-pool",
         image="ghcr.io/spencershepard/mlops-precision-lens/prefect:develop",
-        cron="0 */2 * * *",  # Run every 2 mins
-        build=False,  # Build from existing Dockerfile in the current directory
+        cron="*/2 * * * *",  # Run every 2 mins
+        build=False,  # If true, Prefect will build it's own image (slower)
         tags=["s3", "monitoring", "ml", "classifier-training"],
         concurrency_limit=1,
         description="Monitors S3 for new data and triggers ML classifier training jobs"
