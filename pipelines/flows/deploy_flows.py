@@ -1,11 +1,15 @@
 import os
 import dotenv
-from train_classifier_flow import s3_monitor_flow
 import sys
 
 # Provide the Prefect API URL if needed (ie. local development)
 if len(sys.argv) > 1:
     os.environ["PREFECT_API_URL"] = sys.argv[1]
+    
+print(f"Using PREFECT_API_URL: {os.environ.get('PREFECT_API_URL', 'Not set')}")
+
+# Load Prefect modules after setting PREFECT_API_URL
+from train_classifier_flow import s3_monitor_flow
 
 def deploy_classifier_training_flow():
     """Deploy the S3 monitor training flow to Prefect server"""
