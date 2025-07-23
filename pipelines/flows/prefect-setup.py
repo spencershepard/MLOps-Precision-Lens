@@ -1,5 +1,5 @@
 from prefect.client import get_client
-from prefect.blocks.kubernetes import KubernetesClusterConfig
+from prefect_kubernetes import KubernetesClusterConfig
 import asyncio
 
 cluster_config = KubernetesClusterConfig.load("my-cluster")
