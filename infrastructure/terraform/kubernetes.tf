@@ -39,6 +39,15 @@ locals {
     )
     if length(split("=", line)) == 2 && trimspace(line) != ""
   }
+
+  kubeconfig = jsonencode(yamldecode(file("${path.module}/.kubeconfig")))
+
+  secrets_w_kubeconfig = merge(
+    local.secrets,
+    {
+      KUBECONFIG = local.kubeconfig
+    }
+  )
 }
 
 resource "kubernetes_secret" "pl_secrets" {

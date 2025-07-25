@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "2.37.1"
     }
+    prefect = {
+      source = "prefecthq/prefect"
+      version = "2.83.0"
+    }
   }
   
 }
