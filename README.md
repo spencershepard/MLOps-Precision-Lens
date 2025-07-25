@@ -60,25 +60,23 @@ flowchart TD
    - Update `secrets.env` with your AWS credentials and other necessary secrets.
    - Update `config.env` with your desired configuration settings.
 
-3. **Deploy the infrastructure**:
+3. **Setup Hostnames**:
+   - Update your `/etc/hosts` on linux, or run [infrastructure\scripts\setup-local-domains.ps1](infrastructure/scripts/setup-local-domains.ps1) on Windows.
+
+4. **Deploy the infrastructure**:
    - Navigate to the `infrastructure/terraform` directory.
    - Run the following command to deploy the infrastructure:
      ```bash
      terraform init
      terraform apply
      ```
+   **Note**: If apply fails, you may need to make the following changes in the Prefect UI under Blocks:
+   - Edit 'my-pool' and set the cluster_config to the automatically created 'my-cluster' block.
+   - Edit the `my-k8s-creds` block and set the `cluster_config' to the automatically created 'my-cluster' block.
+   - Edit the `my-s3` block and set the `aws_credentials` to the automatically created 'my-aws' block.
+   - terraform apply again.
 
-4. **Setup Hostnames**:
-   - Update your `/etc/hosts` on linux, or run [infrastructure\scripts\setup-local-domains.ps1](infrastructure/scripts/setup-local-domains.ps1) on Windows.
-
-5. **Setup Prefect**:
-   - In the Prefect UI, create a new block for your Kubenetes config.
-   - Add the new block to 'my-pool' in the Prefect UI under Work Pools.
-   - Create a Kubernetes Credentials block called `my-k8s-creds` and link it to the Kubernetes config block you created.
-   - Create an AWS credentials block in Prefect with the name `my-aws`. 
-   - Finally, create an S3 block called `my-s3` and link it to the AWS credentials block.
-
-6. **Add the first model**
+5. **Add the first model**
    In MLFLow, create a new model for each product/part class you want to detect anomalies for. 
 
 
