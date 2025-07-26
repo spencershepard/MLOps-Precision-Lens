@@ -9,8 +9,8 @@ apprise==1.9.3
 asgi-lifespan==2.1.0
 asyncpg==0.30.0
 attrs==25.3.0
-boto3==1.39.9
-botocore==1.39.9
+boto3==1.39.14
+botocore==1.39.14
 cachetools==5.5.2
 certifi==2025.7.14
 cffi==1.17.1
@@ -30,7 +30,7 @@ fsspec==2025.7.0
 google-auth==2.40.3
 graphviz==0.21
 greenlet==3.2.3
-griffe==1.7.3
+griffe==1.8.0
 h11==0.16.0
 h2==4.2.0
 hpack==4.1.0
@@ -61,12 +61,12 @@ mypy-boto3-s3==1.39.5
 mypy-boto3-secretsmanager==1.39.0
 oauthlib==3.3.1
 opentelemetry-api==1.35.0
-orjson==3.11.0
+orjson==3.11.1
 packaging==25.0
 pathspec==0.12.1
-prefect==3.4.9
+prefect==3.4.10
 prefect-aws==0.5.12
-prefect-kubernetes==0.6.1
+prefect-kubernetes==0.6.3
 prometheus_client==0.22.1
 propcache==0.3.2
 pyasn1==0.6.1
@@ -93,7 +93,7 @@ regex==2024.11.6
 requests==2.32.4
 requests-oauthlib==2.0.0
 rfc3339-validator==0.1.4
-rich==14.0.0
+rich==14.1.0
 rpds-py==0.26.0
 rsa==4.9.1
 ruamel.yaml==0.18.14
@@ -104,7 +104,7 @@ shellingham==1.5.4
 six==1.17.0
 sniffio==1.3.1
 SQLAlchemy==2.0.41
-starlette==0.47.1
+starlette==0.47.2
 tenacity==9.1.2
 text-unidecode==1.3
 toml==0.10.2
@@ -114,10 +114,10 @@ typing_extensions==4.14.1
 tzdata==2025.2
 tzlocal==5.3.1
 urllib3==2.5.0
-uv==0.8.0
+uv==0.8.3
 uvicorn==0.35.0
 websocket-client==1.8.0
 websockets==15.0.1
-whenever==0.8.7
+whenever==0.8.8
 yarl==1.20.1
 zipp==3.23.0
