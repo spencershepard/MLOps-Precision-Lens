@@ -84,8 +84,8 @@ def trigger_k8s_job(s3_key: str):
     logger.info(f"Starting Kubernetes job using Prefect KubernetesJob")
 
     k8s_creds = KubernetesCredentials.load("my-k8s-creds")
-
-    job_name = f"train-classifier-{s3_key}"
+    epoch_secs = int(datetime.now(timezone.utc).timestamp())
+    job_name = f"train-classifier-{epoch_secs}-{s3_key}"
 
     job_name = sanitize_k8s_name(job_name)
     logger.info(f"Job name: {job_name}")
