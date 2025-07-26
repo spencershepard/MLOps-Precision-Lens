@@ -105,6 +105,24 @@ resource "kubernetes_deployment_v1" "pl-app" {
   }
 }
 
+resource "kubernetes_service" "pl-app" {
+  metadata {
+    name      = "pl-app"
+    namespace = kubernetes_namespace.pl-app.metadata[0].name
+  }
+  spec {
+    selector = {
+      app = "pl-app"
+    }
+    port {
+      port        = 8050
+      target_port = 8050
+      protocol    = "TCP"
+    }
+    type = "ClusterIP"
+  }
+}
+
 resource "kubernetes_secret" "pl_app_secrets" {
   metadata {
     name      = "pl-secrets"
