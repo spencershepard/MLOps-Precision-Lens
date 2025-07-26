@@ -7,7 +7,7 @@ on:
       - 'apps/inspection-app/**'
 
 jobs:
-  build-prefect-image:
+  build-app-image:
     uses: ./.github/workflows/build-docker-image.yaml
     with:
       image_name: "precision-lens"
