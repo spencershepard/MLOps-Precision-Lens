@@ -7,10 +7,16 @@ from dash import html, dcc, callback, Input, Output
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 import models
-import s3data
+# import s3data
 import time
 import os
 import requests 
+from s3dataset import s3data
+
+
+
+CLASSIFICATION_API_URL = os.getenv('CLASSIFICATION_API_URL', 'http://classification-api.local:8000/predict')
+ANOMALY_API_URL = os.getenv('ANOMALY_API_URL', 'http://anomaly-detection.local:8000/predict')
 
 # loads the "darkly" template and sets it as the default
 load_figure_template("darkly")
@@ -189,7 +195,7 @@ def handle_panel_visibility(capture_clicks, discard_clicks, classify_clicks, val
             print("Classifying capture")
             try:
                 resp = requests.post(
-                    "http://localhost:8000/predict",
+                    CLASSIFICATION_API_URL,
                     json={"image": captured_frame}
                 )
                 response_data = resp.json()
