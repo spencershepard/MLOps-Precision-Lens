@@ -74,13 +74,16 @@ def trigger_k8s_job(s3_key: str):
 
     k8s_creds = KubernetesCredentials.load("my-k8s-creds")
 
+    job_name = f"train-classifier-{s3_key.replace('/', '-')[:50].lower()}"
+    logger.info(f"Job name: {job_name}")
+
     job_spec = {
         "apiVersion": "batch/v1",
         "kind": "Job",
-        "metadata": {"name": f"s3-process-{s3_key.replace('/', '-')[:50].lower()}"},
+        "metadata": {"name": job_name},
         "spec": {
             "template": {
-                "metadata": {"labels": {"job": f"s3-process-{s3_key.replace('/', '-')[:50].lower()}"}} ,
+                "metadata": {"labels": {"job": job_name}},
                 "spec": {
                     "restartPolicy": "Never",
                     "containers": [
@@ -161,22 +164,24 @@ def any_new_s3_objects(last_time=None):
     response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=PREFIX)
     latest_time = last_time
     found_new = False
+    obj_key = None
     for obj in response.get("Contents", []):
         obj_time = obj["LastModified"].isoformat()
         if last_time is None or obj_time > last_time:
             found_new = True
             if latest_time is None or obj_time > latest_time:
                 latest_time = obj_time
+                obj_key = obj["Key"]
     logger.info(f"Any new S3 objects? {found_new}")
-    return found_new, latest_time
+    return found_new, latest_time, obj_key
 
 @flow(name="s3-monitor-flow", log_prints=True)
 def s3_monitor_flow():
     logger = get_run_logger()
     last_time = get_last_processed_time()
-    found_new, latest_time = any_new_s3_objects(last_time)
+    found_new, latest_time, obj_key = any_new_s3_objects(last_time)
     if found_new:
-        trigger_k8s_job("s3-change-detected")
+        trigger_k8s_job(obj_key)
         if latest_time:
             set_last_processed_time(latest_time)
             logger.info(f"Updated last processed time to {latest_time}")
