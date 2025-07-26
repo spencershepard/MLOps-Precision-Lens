@@ -165,7 +165,7 @@ def get_last_processed_time():
 
 @task
 def set_last_processed_time(new_time):
-    Variable.set("last_processed_s3_time", new_time)
+    Variable.set("last_processed_s3_time", new_time, overwrite=True)
 
 @task
 def any_new_s3_objects(last_time=None):
