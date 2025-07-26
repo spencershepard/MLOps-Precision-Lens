@@ -52,7 +52,7 @@ if not BUCKET_NAME:
 def sanitize_k8s_name(name: str, max_length=63):
     name = name.lower()
     # Replace invalid characters with '-'
-    name = re.sub(r'[^a-z0-9\-_]', '-', name)
+    name = re.sub(r'[^a-z0-9\-\.]', '-', name)
     # Ensure starts/ends with alphanumeric
     name = re.sub(r'^[^a-z0-9]+', '', name)
     name = re.sub(r'[^a-z0-9]+$', '', name)
@@ -99,7 +99,6 @@ def trigger_k8s_job(s3_key: str):
                 "metadata": {"labels": {"job": job_name}},
                 "spec": {
                     "restartPolicy": "Never",
-                    "imagePullPolicy": "Always",
                     "containers": [
                         {
                             "name": "processor",
