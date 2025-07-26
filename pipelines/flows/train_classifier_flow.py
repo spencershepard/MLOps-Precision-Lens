@@ -7,6 +7,7 @@ import base64
 import prefect.input
 import prefect.states
 import yaml
+import re
 
 os.environ.setdefault("PREFECT_LOGGING_LEVEL", "INFO")
 
@@ -48,6 +49,15 @@ if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
 if not BUCKET_NAME:
     raise ValueError("S3 bucket name is not set in environment variables.")
 
+def sanitize_k8s_name(name: str, max_length=63):
+    # Replace invalid characters with '-'
+    name = re.sub(r'[^A-Za-z0-9\-_.]', '-', name)
+    # Ensure starts/ends with alphanumeric
+    name = re.sub(r'^[^A-Za-z0-9]+', '', name)
+    name = re.sub(r'[^A-Za-z0-9]+$', '', name)
+    # Truncate to max_length
+    return name[:max_length]
+
 @task
 def list_new_s3_keys(since_minutes_ago=10):
     logger = get_run_logger()
@@ -74,7 +84,9 @@ def trigger_k8s_job(s3_key: str):
 
     k8s_creds = KubernetesCredentials.load("my-k8s-creds")
 
-    job_name = f"train-classifier-{s3_key.replace('/', '-')[:50].lower()}"
+    raw_job_name = f"train-classifier-{s3_key.replace('/', '-')}"
+
+    job_name = sanitize_k8s_name(raw_job_name)
     logger.info(f"Job name: {job_name}")
 
     job_spec = {
