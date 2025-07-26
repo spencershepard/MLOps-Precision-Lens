@@ -1,6 +1,17 @@
 provider "prefect" {
   endpoint = "http://prefect.local:30080/api"
 }
+
+resource "prefect_variable" "mlflow_uri" {
+  name  = "mlflow_uri"
+  value = "http://mlflow.mlflow.svc.cluster.local:80"
+}
+
+resource "prefect_variable" "class_training_img_limit" {
+  name  = "class_training_img_limit"
+  value = "10"
+}
+
 resource "kubernetes_namespace" "prefect" {
   metadata {
     name = "prefect"
@@ -255,4 +266,5 @@ resource "kubernetes_job" "prefect_deployment_job" {
       }
     }
   }
+  
 }

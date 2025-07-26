@@ -39,8 +39,8 @@ AWS_SECRET_ACCESS_KEY = _to_str(aws_credentials_block.aws_secret_access_key)
 BUCKET_NAME = s3_bucket.bucket_name
 AWS_REGION = aws_credentials_block.region_name
 
-MLFLOW_URI = os.getenv("MLFLOW_URI", "http://mlflow.mlflow.svc.cluster.local:80")
-CLASS_TRAINING_IMG_LIMIT = os.getenv("CLASS_TRAINING_IMG_LIMIT", "5")
+MLFLOW_URI = Variable.get("MLFLOW_URI", default="http://mlflow.mlflow.svc.cluster.local:80")
+CLASS_TRAINING_IMG_LIMIT = Variable.get("CLASS_TRAINING_IMG_LIMIT", default="10")
 
 PREFIX = ""
 
