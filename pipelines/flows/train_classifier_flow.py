@@ -51,7 +51,7 @@ if not BUCKET_NAME:
 
 def sanitize_k8s_name(name: str, max_length=63):
     # Replace invalid characters with '-'
-    name = re.sub(r'[^A-Za-z0-9\-_.]', '-', name)
+    name = re.sub(r'[^A-Za-z0-9\-_]', '-', name)
     # Ensure starts/ends with alphanumeric
     name = re.sub(r'^[^A-Za-z0-9]+', '', name)
     name = re.sub(r'[^A-Za-z0-9]+$', '', name)
@@ -84,9 +84,9 @@ def trigger_k8s_job(s3_key: str):
 
     k8s_creds = KubernetesCredentials.load("my-k8s-creds")
 
-    raw_job_name = f"train-classifier-{s3_key.replace('/', '-')}"
+    job_name = f"train-classifier-{s3_key}"
 
-    job_name = sanitize_k8s_name(raw_job_name)
+    job_name = sanitize_k8s_name(job_name)
     logger.info(f"Job name: {job_name}")
 
     job_spec = {
