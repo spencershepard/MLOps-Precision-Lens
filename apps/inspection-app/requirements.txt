@@ -51,7 +51,7 @@ packaging==25.0
 pandas==2.3.1
 pillow==11.3.0
 plotly==6.2.0
--e git+https://github.com/spencershepard/MLOps-Precision-Lens.git@a6ea17aa0fe46f3716173a4b3eb8d981a63358cb#egg=precision_lens&subdirectory=shared_libraries
+-e git+https://github.com/spencershepard/MLOps-Precision-Lens.git@develop#egg=precision_lens&subdirectory=shared_libraries
 protobuf==6.31.1
 pyarrow==20.0.0
 pyasn1==0.6.1
