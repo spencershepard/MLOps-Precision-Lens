@@ -7,13 +7,9 @@ $entries = @(
     "127.0.0.1 mlflow.local",
     "127.0.0.1 grafana.local",
     "127.0.0.1 labelstudio.local",
-    "127.0.0.1 app.local",
     "127.0.0.1 airflow.local",
     "127.0.0.1 prefect.local",
-    "127.0.0.1 classification-api.local",
-    "127.0.0.1 anomaly-detection.local",
     "127.0.0.1 precision-lens.local",
-    "127.0.0.1 api.local"
 )
 
 Write-Host "Setting up local domains for development..." -ForegroundColor Green

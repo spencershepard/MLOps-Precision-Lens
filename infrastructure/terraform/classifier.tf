@@ -76,6 +76,7 @@ resource "kubernetes_deployment_v1" "classifier" {
         container {
           name  = "classifier"
           image = "ghcr.io/spencershepard/mlops-precision-lens/classifier:develop"
+          args = [ "python", "-u", "predict.py" ]
 
           port {
             container_port = 8000

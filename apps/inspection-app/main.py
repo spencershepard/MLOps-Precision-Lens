@@ -15,8 +15,8 @@ from s3dataset import s3data
 
 
 
-CLASSIFICATION_API_URL = os.getenv('CLASSIFICATION_API_URL', 'http://classification-api.local:30080/predict')
-ANOMALY_API_URL = os.getenv('ANOMALY_API_URL', 'http://anomaly-detection.local:30080/predict')
+CLASSIFICATION_API_URL = os.getenv('CLASSIFICATION_API_URL', 'http://classifier.classifier.svc.cluster.local:8000/predict')
+ANOMALY_API_URL = os.getenv('ANOMALY_API_URL', 'http://anomaly.anomaly.svc.cluster.local:8000/predict')
 
 # loads the "darkly" template and sets it as the default
 load_figure_template("darkly")
