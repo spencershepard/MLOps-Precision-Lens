@@ -20,7 +20,7 @@ print("Starting model prediction service...")
 MLFLOW_URI = os.getenv("MLFLOW_URI")
 if not MLFLOW_URI:
     raise ValueError("MLFLOW_URI environment variable is not set.")
-model_name = "Factory Classifier"
+model_name = "Precision Lens Classifier"
 cache_dir = "s3cache"
 if not os.path.exists(cache_dir):
     os.makedirs(cache_dir)
