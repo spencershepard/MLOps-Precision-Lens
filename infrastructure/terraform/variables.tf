@@ -76,6 +76,18 @@ variable "pl_app_domain" {
   default     = "precision-lens.local"
 }
 
+variable "classifier_domain" {
+  type        = string
+  description = "Domain name for classifier api in production (e.g., classifier.company.com)"
+  default     = "classification-api.local"
+}
+
+variable "anomaly_domain" {
+  type        = string
+  description = "Domain name for anomaly detection api in production (e.g., anomaly.company.com)"
+  default     = "anomaly-detection.local"
+}
+
 variable "label_studio_access_key" {
   type        = string
   description = "Access key for Label Studio S3"
