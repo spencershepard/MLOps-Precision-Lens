@@ -21,9 +21,18 @@ MLFLOW_URI = os.getenv("MLFLOW_URI")
 if not MLFLOW_URI:
     raise ValueError("MLFLOW_URI environment variable is not set.")
 model_name = "Precision Lens Classifier"
-cache_dir = "s3cache"
-if not os.path.exists(cache_dir):
-    os.makedirs(cache_dir)
+
+# use persistent cache directory if available, otherwise use ephemeral container filesystem
+volume_mount_path = "/mnt/s3cache"
+ephemeral_cache_dir = "s3cache"
+if os.path.exists(volume_mount_path):
+    cache_dir = volume_mount_path
+else:
+    cache_dir = ephemeral_cache_dir
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
+
+print(f"Using cache directory: {cache_dir}")
 mlflow.set_tracking_uri(MLFLOW_URI)
 
 # Global variable to cache the model

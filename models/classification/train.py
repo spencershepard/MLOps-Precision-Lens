@@ -26,9 +26,17 @@ if not BUCKET_NAME or not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
 MLFLOW_URI = os.getenv('MLFLOW_URI')
 CLASS_TRAINING_IMG_LIMIT= int(os.getenv("CLASS_TRAINING_IMG_LIMIT", 100))
 
-cache_dir = "s3cache"
-if not os.path.exists(cache_dir):
-    os.makedirs(cache_dir)
+# use persistent cache directory if available, otherwise use ephemeral container filesystem
+volume_mount_path = "/mnt/s3cache"
+ephemeral_cache_dir = "s3cache"
+if os.path.exists(volume_mount_path):
+    cache_dir = volume_mount_path
+else:
+    cache_dir = ephemeral_cache_dir
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
+
+print(f"Using cache directory: {cache_dir}")
 
 print(f"Setting up MLflow tracking with URI: {MLFLOW_URI}")
 mlflow.set_tracking_uri(MLFLOW_URI)

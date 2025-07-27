@@ -131,6 +131,20 @@ def trigger_k8s_job(s3_key: str):
                                     "value": CLASS_TRAINING_IMG_LIMIT
                                 },
                             ],
+                            "volumeMounts": [
+                                {
+                                    "name": "s3cache-volume",
+                                    "mountPath": "/mnt/s3cache"
+                                }
+                            ],
+                        }
+                    ],
+                    "volumes": [
+                        {
+                            "name": "s3cache-volume",
+                            "persistentVolumeClaim": {
+                                "claimName": "s3cache-pvc"
+                            }
                         }
                     ],
                 },
@@ -141,7 +155,7 @@ def trigger_k8s_job(s3_key: str):
     k8s_job = KubernetesJob(
         v1_job=job_spec,
         credentials=k8s_creds,
-        namespace="default"
+        namespace="models"
     )
 
     run = k8s_job.trigger()
