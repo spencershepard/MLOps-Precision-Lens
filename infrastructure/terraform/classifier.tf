@@ -4,50 +4,6 @@ resource "kubernetes_namespace" "classifier" {
   }
 }
 
-resource "kubernetes_ingress_v1" "classifier" {
-  metadata {
-    name      = "classifier-ingress"
-    namespace = kubernetes_namespace.classifier.metadata[0].name
-    annotations = {
-      "kubernetes.io/ingress.class"                = "nginx"
-      "nginx.ingress.kubernetes.io/rewrite-target" = "/"
-      "nginx.ingress.kubernetes.io/ssl-redirect"   = var.environment == "production" ? "true" : "false"
-    }
-  }
-
-  spec {
-    rule {
-      host = var.classifier_domain
-      http {
-        path {
-          path      = "/"
-          path_type = "Prefix"
-          backend {
-            service {
-              name = "classifier"
-              port {
-                number = 8000
-              }
-            }
-          }
-        }
-      }
-    }
-
-    # TLS configuration for production
-    dynamic "tls" {
-      for_each = var.environment == "production" ? [1] : []
-      content {
-        hosts       = [var.classifier_domain]
-        secret_name = "classifier-tls"
-      }
-    }
-  }
-
-  depends_on = [helm_release.nginx_ingress, kubernetes_namespace.classifier]
-}
-
-
 resource "kubernetes_deployment_v1" "classifier" {
   metadata {
     name      = "classifier"
