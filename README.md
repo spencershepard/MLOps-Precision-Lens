@@ -37,7 +37,7 @@ flowchart TD
 - **apps/inspection-app**: Contains the code for the operator web app (Plotly Dash).
 - **infrastructure/**: Terraform IaC for deploying the complete stack to a Kubernetes cluster.
 - **models/**: Contains the model training and inference code.
-- **pipelines/**: Contains the ML pipelines for automated training. (Apache Airflow))
+- **pipelines/**: Contains the ML pipelines for automated training. (Prefect)
 
 **See the project folders for additional details and documentation on each component.**
 
