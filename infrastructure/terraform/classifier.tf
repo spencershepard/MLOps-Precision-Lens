@@ -115,8 +115,8 @@ resource "kubernetes_service" "classifier" {
       app = "classifier"
     }
     port {
-      port        = 8050
-      target_port = 8050
+      port        = 8000
+      target_port = 8000
       protocol    = "TCP"
     }
     type = "ClusterIP"
