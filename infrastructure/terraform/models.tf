@@ -4,36 +4,6 @@ resource "kubernetes_namespace" "models" {
   }
 }
 
-resource "kubernetes_persistent_volume" "s3cache" {
-  metadata {
-    name = "s3cache-pv"
-  }
-  spec {
-    capacity = {
-      storage = "10Gi"
-    }
-    access_modes = ["ReadWriteMany"]
-    persistent_volume_reclaim_policy = "Retain"
-    storage_class_name = "hostpath"
-    persistent_volume_source {
-      host_path {
-        path = "/run/desktop/mnt/host/c/Users/spencer.shepard/k8s-data/s3cache"
-      }
-    }
-    node_affinity {
-      required {
-        node_selector_term {
-          match_expressions {
-            key      = "kubernetes.io/hostname"
-            operator = "In"
-            values   = ["docker-desktop"]
-          }
-        }
-      }
-    }
-  }
-}
-
 resource "kubernetes_persistent_volume_claim" "s3cache" {
   metadata {
     name      = "s3cache-pvc"
@@ -46,7 +16,7 @@ resource "kubernetes_persistent_volume_claim" "s3cache" {
         storage = "10Gi"
       }
     }
-    volume_name = kubernetes_persistent_volume.s3cache.metadata[0].name
+    storage_class_name = "hostpath"
   }
 }
 
