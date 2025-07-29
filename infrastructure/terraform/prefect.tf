@@ -1,5 +1,5 @@
 provider "prefect" {
-  endpoint = "http://prefect.local:30080/api"
+  endpoint = var.prefect_api_url
 }
 
 resource "prefect_variable" "mlflow_uri" {
@@ -71,7 +71,7 @@ resource "helm_release" "prefect-server" {
   set = [
     {
       name  = "server.uiConfig.prefectUiApiUrl"
-      value = "http://${ var.prefect_domain}:30080/api"
+      value = var.prefect_api_url
     },
     {
       name  = "sqlite.enabled"
