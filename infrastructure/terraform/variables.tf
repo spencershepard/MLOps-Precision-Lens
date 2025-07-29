@@ -70,6 +70,12 @@ variable "prefect_domain" {
   default     = "prefect.local"
 }
 
+variable "prefect_api_url" {
+  type        = string
+  description = "API URL for Prefect server (e.g., http://prefect:4200/api)"
+  default     = "http://prefect:4200/api"
+}
+
 variable "pl_app_domain" {
   type        = string
   description = "Domain name for Precision Lens app in production (e.g., pl.company.com)"
