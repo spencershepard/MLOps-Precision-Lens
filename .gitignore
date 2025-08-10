@@ -187,3 +187,7 @@ cython_debug/
 
 s3_cache/
 mlruns/
+/checkpoints/*
+*.ckpt
+/models/anomaly/results
+/.scratchpad
