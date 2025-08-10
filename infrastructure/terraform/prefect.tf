@@ -84,6 +84,11 @@ resource "helm_release" "prefect-server" {
     {
       name  = "postgresql.enabled"
       value = "false"
+    },
+    {
+      name  = "service.annotations.tailscale\\.com\\/expose"
+      value = "true"
+      type = "string"
     }
   ]
 }
