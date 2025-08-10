@@ -73,7 +73,7 @@ variable "prefect_domain" {
 variable "prefect_api_url" {
   type        = string
   description = "API URL for Prefect server (e.g., http://prefect:4200/api)"
-  default     = "http://prefect:4200/api"
+  default     = "http://prefect-prefect-server:4200/api"
 }
 
 variable "pl_app_domain" {

@@ -102,7 +102,7 @@ resource "kubernetes_service" "classifier" {
   }
   spec {
     selector = {
-      app = "classifier"
+      app = "models"
     }
     port {
       port        = 8000
