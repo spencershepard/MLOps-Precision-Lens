@@ -3,9 +3,13 @@ Precision Lens is an end to end MLOps project for image anomaly detection in a m
 
 On the inference side, it utilizes an ML pipeline to classify an image as a particular product/part, and then selects a pre-trained model to detect anomalies in the image.
 
+![Anomaly Detection](docs/images/bottle_broken_results.png)
+
 On the training side, new data captured from the manufacturing line is used to retrain the classification model and the anomaly detection models automatically.
 
 The focus of this project is to provide a robust and scalable solution for image classification and anomaly detection in a production environment, leveraging modern MLOps practices. ⚙️ Ease of use, quality data collection, automation, auditability, and scalability are key design principles.
+
+
 
 ```mermaid
 flowchart TD
