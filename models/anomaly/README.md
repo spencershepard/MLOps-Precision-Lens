@@ -1,9 +1,13 @@
 ## Anomalib Installation
-Recommended installation method is via requirements.txt file.  However, if starting fresh, Anomalib installation is as follows:
+Recommended installation method is via requirements.txt file.  However, anomalib installation can be a bit tricky, and you may want to customize this for your hardware. 
 
+Example installing everything with requirements.txt, and then customizing the installation:
 ```bash
-pip install anomalib[optional_dependencies]
-anomalib install
+pip install -r requirements.txt
+pip uninstall anomalib
+pip uninstall torch
+pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu128
+pip install anomalib[full]
 ```
 
 Optional dependencies include hardware acceleration libraries and models. https://github.com/open-edge-platform/anomalib?tab=readme-ov-file#-installation
