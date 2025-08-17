@@ -1,4 +1,9 @@
 terraform {
+  backend "s3" {
+    bucket         = "precision-lens-terraform-state"
+    key            = "terraform/terraform.tfstate"
+    region        = "us-east-1"
+  }
   required_providers {
     helm = {
       source  = "hashicorp/helm"
