@@ -9,7 +9,7 @@ import prefect.states
 import yaml
 import re
 
-FLOW_VERSION="1.0.0"
+FLOW_VERSION="1.0.1"
 os.environ.setdefault("PREFECT_LOGGING_LEVEL", "INFO")
 
 local_development = not os.getenv("PREFECT_API_URL")
@@ -58,7 +58,10 @@ def sanitize_k8s_name(name: str, max_length=63):
     name = re.sub(r'^[^a-z0-9]+', '', name)
     name = re.sub(r'[^a-z0-9]+$', '', name)
     # Truncate to max_length
-    return name[:max_length]
+    name = name[:max_length]
+    # Ensure ends with alphanumeric after truncation
+    name = re.sub(r'[^a-z0-9]+$', '', name)
+    return name
 
 @task
 def list_new_s3_keys(since_minutes_ago=10):
