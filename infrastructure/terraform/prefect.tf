@@ -75,18 +75,18 @@ resource "helm_release" "prefect-server" {
     },
     {
       name  = "sqlite.enabled"
-      value = "true"
-    },
-    {
-      name  = "sqlite.persistence.enabled"
-      value = "true"
-    },
-    {
-      name  = "postgresql.enabled"
       value = "false"
     },
     {
-      name  = "service.annotations.tailscale\\.com\\/expose"
+      name  = "sqlite.persistence.enabled"
+      value = "false"
+    },
+    {
+      name  = "postgresql.enabled"
+      value = "true"
+    },
+    {
+      name  = "service.annotations.tailscale\\.com\\/expose"  # Don't touch this block.
       value = "true"
       type = "string"
     }

@@ -9,6 +9,7 @@ import prefect.states
 import yaml
 import re
 
+FLOW_VERSION="1.0.0"
 os.environ.setdefault("PREFECT_LOGGING_LEVEL", "INFO")
 
 local_development = not os.getenv("PREFECT_API_URL")
@@ -81,6 +82,7 @@ def list_new_s3_keys(since_minutes_ago=10):
 @task
 def trigger_k8s_job(s3_key: str):
     logger = get_run_logger()
+    logger.info(f"Flow version: {FLOW_VERSION}")
     logger.info(f"Starting Kubernetes job using Prefect KubernetesJob")
 
     k8s_creds = KubernetesCredentials.load("my-k8s-creds")
