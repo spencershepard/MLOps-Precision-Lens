@@ -191,3 +191,5 @@ mlruns/
 *.ckpt
 /models/anomaly/results
 /.scratchpad
+/models/classification/cache
+models/anomaly/fastflow_prediction.png

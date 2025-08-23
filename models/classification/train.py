@@ -13,6 +13,8 @@ from sklearn.metrics import (accuracy_score, classification_report,
                            confusion_matrix, precision_recall_fscore_support)
 from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.svm import SVC
+from skimage import img_as_float
+import albumentations as A
 
 print("Loading environment variables...")
 
@@ -24,7 +26,8 @@ BUCKET_NAME = os.getenv('BUCKET_NAME')
 if not BUCKET_NAME or not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
     raise ValueError("Please set the BUCKET_NAME, AWS_ACCESS_KEY_ID, and AWS_SECRET_ACCESS_KEY in your environment.")
 MLFLOW_URI = os.getenv('MLFLOW_URI')
-CLASS_TRAINING_IMG_LIMIT= int(os.getenv("CLASS_TRAINING_IMG_LIMIT", 100))
+CLASS_TRAINING_IMG_LIMIT= int(os.getenv("CLASS_TRAINING_IMG_LIMIT", 5))
+NUM_AUGMENTATIONS = 3 # Number of augmentations per image (excluding original)
 
 # use persistent cache directory if available, otherwise use ephemeral container filesystem
 volume_mount_path = "/mnt/s3cache"
@@ -67,7 +70,7 @@ def get_training_images_from_s3(bucket_name):
     
     for obj in response['Contents']:
         key = obj['Key']
-        class_name = key.split('/')[0]  # Assuming the structure is <class_name>/train/good/<image_name>
+        class_name = key.split('/')[0]  # Assuming the structure is <class_name>/train/good/
         split = key.split('/')[1] # This should be 'train' or 'test'
         if split == 'train':
             category = key.split('/')[2]  # This should be 'good' or other categories
@@ -94,32 +97,62 @@ def get_training_images_from_s3(bucket_name):
     return images, labels
 
 
+
+def build_augmentation_pipeline():
+    transforms = []
+    for aug in AUGMENTATION_PIPELINE:
+        name = aug["transform"]
+        params = {k: v for k, v in aug.items() if k != "transform"}
+        if name == "HorizontalFlip":
+            transforms.append(A.HorizontalFlip(**params))
+        elif name == "RandomRotate90":
+            transforms.append(A.RandomRotate90(**params))
+        elif name == "ShiftScaleRotate":
+            transforms.append(A.ShiftScaleRotate(**params))
+        elif name == "RandomBrightnessContrast":
+            transforms.append(A.RandomBrightnessContrast(**params))
+        # Add more transforms here as needed
+    return A.Compose(transforms)
+
 def prepare_data(images_paths, labels):
     _data = []
     _labels = []
 
-    for image_path in images_paths:
-        label = labels[images_paths.index(image_path)]
+    aug = build_augmentation_pipeline()
+
+    for idx, image_path in enumerate(images_paths):
+        label = labels[idx]
         if os.path.isfile(image_path):
             img = imread(image_path)
             img = resize(img, (512, 512), anti_aliasing=True)
-            # Note: images may have different aspect ratios, so
-            # without cropping or padding, resizing could distort the images
+            img = img_as_float(img)  # Normalize to [0, 1]
+
+            # Add original image
             flattened_img = img.flatten()
-            if flattened_img.size == 512 * 512 * 3:  # Ensure the image is in RGB format
-                print(f"Appending image to data: label: {label} path:{image_path}, shape: {img.shape}")
+            if flattened_img.size == 512 * 512 * 3:
+                print(f"Appending original image to data: label: {label} path:{image_path}, shape: {img.shape}")
                 _data.append(flattened_img)
                 _labels.append(label)
+
+            # Add augmentations
+            for aug_idx in range(NUM_AUGMENTATIONS):
+                aug_img = aug(image=img)["image"]
+                flattened_aug_img = aug_img.flatten()
+                if flattened_aug_img.size == 512 * 512 * 3:
+                    print(f"Appending augmented image {aug_idx+1} to data: label: {label} path:{image_path}, shape: {aug_img.shape}")
+                    _data.append(flattened_aug_img)
+                    _labels.append(label)
         else:
             print(f"Image not found: {image_path}")
 
     # Log data preparation metrics
     unique_labels = np.unique(labels)
-    label_counts = {label: labels.count(label) for label in unique_labels}
+    label_counts = {label: _labels.count(label) for label in unique_labels}
     
     mlflow.log_param("total_images_processed", len(_data))
     mlflow.log_param("unique_classes", len(unique_labels))
     mlflow.log_param("class_names", list(unique_labels))
+    mlflow.log_param("num_augmentations_per_image", NUM_AUGMENTATIONS)
     for label, count in label_counts.items():
         mlflow.log_metric(f"class_{label}_count", count)
 
@@ -221,6 +254,12 @@ def predict_image(classifier, image_path):
     confidence = np.max(probabilities)  # Highest probability as confidence
     return prediction[0], confidence
 
+AUGMENTATION_PIPELINE = [
+    {"transform": "HorizontalFlip", "p": 0.5},
+    {"transform": "RandomRotate90", "p": 0.5},
+    {"transform": "ShiftScaleRotate", "shift_limit": 0.05, "scale_limit": 0.1, "rotate_limit": 15, "p": 0.5},
+    {"transform": "RandomBrightnessContrast", "p": 0.5},
+]
 
 
 print("Starting image classification training...")
@@ -233,6 +272,7 @@ with mlflow.start_run(run_name="image_classification_training") as run:
     mlflow.log_param("class_training_limit", CLASS_TRAINING_IMG_LIMIT)
     mlflow.log_param("image_size", "512x512") 
     mlflow.log_param("test_split_ratio", 0.2)
+    mlflow.log_param("augmentation_pipeline", str(AUGMENTATION_PIPELINE))
 
     images, labels = get_training_images_from_s3(BUCKET_NAME)
     if not images or not labels:
@@ -258,10 +298,10 @@ with mlflow.start_run(run_name="image_classification_training") as run:
     )
     
     # Save and log additional artifacts
-    print("Saving and logging the best classifier model...")
-    model_path = os.path.join(cache_dir, "best_classifier.pkl")
-    pickle.dump(best_classifier, open(model_path, "wb"))
-    mlflow.log_artifact(model_path)
+    # print("Saving and logging the best classifier model...")
+    # model_path = os.path.join(cache_dir, "best_classifier.pkl")
+    # pickle.dump(best_classifier, open(model_path, "wb"))
+    # mlflow.log_artifact(model_path)
     
     # Log model info
     print(f"MLflow Run ID: {run.info.run_id}")
