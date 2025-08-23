@@ -44,7 +44,28 @@ app.layout = html.Div([
                 ], width=12)
             ]),
             html.Div(id="live-feed", children=[
-                html.Div(id="video-container", className="mb-3"),
+                html.Div(
+                    id="video-container", 
+                    className="mb-3",
+                    children=[
+                        # Placeholder for webcam before it loads
+                        html.Div(
+                            id="webcam-placeholder",
+                            style={
+                                "width": "512px",
+                                "height": "512px",
+                                "backgroundColor": "#222",
+                                "border": "2px dashed #555",
+                                "display": "flex",
+                                "alignItems": "center",
+                                "justifyContent": "center",
+                                "color": "#888",
+                                "fontSize": "1.2em"
+                            },
+                            children="Webcam feed will appear here..."
+                        )
+                    ]
+                ),
                 dbc.ButtonGroup([
                     dbc.Button("Classify", id="classify-btn", color="primary", className="me-2"),
                     dbc.Button("Validate", id="validate-btn", color="success", className="me-2"),
