@@ -21,3 +21,14 @@ artifactRoot:
 service:
   type: ClusterIP
   port: 80
+
+resources:
+  requests:
+    memory: "4Gi"   # Increased from 2Gi
+    cpu: "500m"
+  limits:
+    memory: "8Gi"   # Increased from 4Gi
+    cpu: "2000m"
+
+extraEnvVars:
+  GUNICORN_CMD_ARGS: "--workers=2 --timeout=600 --threads=2" # Adjusted for model serving (large files were timing out or OOM)
