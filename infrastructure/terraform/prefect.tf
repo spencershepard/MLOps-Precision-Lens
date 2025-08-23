@@ -5,11 +5,17 @@ provider "prefect" {
 resource "prefect_variable" "mlflow_uri" {
   name  = "mlflow_uri"
   value = "http://mlflow.mlflow.svc.cluster.local:80"
+  depends_on = [
+    helm_release.prefect-server
+  ]
 }
 
 resource "prefect_variable" "class_training_img_limit" {
   name  = "class_training_img_limit"
-  value = "10"
+  value = "25"
+  depends_on = [
+    helm_release.prefect-server
+  ]
 }
 
 resource "kubernetes_namespace" "prefect" {
@@ -75,15 +81,15 @@ resource "helm_release" "prefect-server" {
     },
     {
       name  = "sqlite.enabled"
-      value = "false"
+      value = "true"
     },
     {
       name  = "sqlite.persistence.enabled"
-      value = "false"
+      value = "true"
     },
     {
-      name  = "postgresql.enabled"
-      value = "true"
+      name  = "postgresql.enabled" # there is a postgress persistence value as well
+      value = "false"
     },
     {
       name  = "service.annotations.tailscale\\.com\\/expose"  # Don't touch this block.
