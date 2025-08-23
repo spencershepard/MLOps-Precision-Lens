@@ -99,6 +99,9 @@ resource "kubernetes_service" "classifier" {
   metadata {
     name      = "classifier"
     namespace = kubernetes_namespace.models.metadata[0].name
+    annotations = {
+      "tailscale.com/expose" = "true"
+    }
   }
   spec {
     selector = {

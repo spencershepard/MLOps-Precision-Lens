@@ -193,3 +193,4 @@ mlruns/
 /.scratchpad
 /models/classification/cache
 models/anomaly/fastflow_prediction.png
+models/anomaly/fastflow_prediction.png
