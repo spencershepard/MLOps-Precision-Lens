@@ -18,7 +18,12 @@ import albumentations as A
 
 print("Loading environment variables...")
 
-load_dotenv()
+script_path = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_path)
+
+load_dotenv("../../secrets.env")
+load_dotenv("../../config.env")
+load_dotenv(override=True)
 
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
@@ -286,16 +291,17 @@ with mlflow.start_run(run_name="image_classification_training") as run:
 
     unique_labels = np.unique(labels)
     evaluate_model(best_classifier, x_test, y_test, unique_labels)
+
+    # # Redundant, as the model is already logged, "best_estimator" from grid search
+    # # Create input example for model signature
+    # input_example = x_train[:1]  # Use first training sample as example
     
-    # Create input example for model signature
-    input_example = x_train[:1]  # Use first training sample as example
-    
-    # Log the model with input example to auto-infer signature
-    mlflow.sklearn.log_model(
-        best_classifier, 
-        "best_classifier",
-        input_example=input_example
-    )
+    # # Log the model with input example to auto-infer signature
+    # mlflow.sklearn.log_model(
+    #     best_classifier, 
+    #     "best_classifier",
+    #     input_example=input_example
+    # )
     
     # Save and log additional artifacts
     # print("Saving and logging the best classifier model...")

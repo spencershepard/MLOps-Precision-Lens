@@ -194,3 +194,4 @@ mlruns/
 /models/classification/cache
 models/anomaly/fastflow_prediction.png
 models/anomaly/fastflow_prediction.png
+models/classification/prediction_result.json

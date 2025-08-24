@@ -93,7 +93,7 @@ insertWebcam = () => {
 
     // Add validate button event listener
     document.getElementById("validate-btn").addEventListener("click", () => {
-        console.log("Validate button clicked");
+        console.log("Detect Anomalies button clicked");
         showOverlay("✅ Validating...", "overlay-validate");
         
         const imageData = getImageFromCamera();

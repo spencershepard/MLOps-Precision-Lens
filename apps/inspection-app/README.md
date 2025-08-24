@@ -17,7 +17,7 @@ flowchart TD
     A -->|Classify| D[Classification API]
     D --> E[Classification Result Panel]
     E -->|Dismiss| A
-    A -->|Validate| F[Anomaly Detection API]
+    A -->|Detect Anomalies| F[Anomaly Detection API]
     F --> G[Validation Result Panel]
     G -->|Dismiss| A
 ```
@@ -29,7 +29,7 @@ The live feed displays the webcam stream.
 ![Live Feed](live-feed.png)
 - **Capture**: Takes a snapshot of the webcam feed and opens the capture panel.
 - **Classify**: Sends the captured image to the classification API for analysis. On response from the classification API, the app displays the classification result panel, and selects the validation model from the dropdown. 
-- **Validate**: Captures an image and sends it to the anomaly detection API, displaying the validation result panel.
+- **Detect Anomalies**: Captures an image and sends it to the anomaly detection API, displaying the validation result panel.
 
 ## Capture Panel
 The capture button takes a snapshot of the webcam feed and opens the capture panel. Here the user can submit new images to the S3 bucket as training data for the selected anomaly detection model and the classification model.

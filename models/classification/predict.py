@@ -27,7 +27,6 @@ if not MLFLOW_URI:
     raise ValueError("MLFLOW_URI environment variable is not set.")
 MODEL_NAME = "Precision Lens Classifier"
 CACHE_DIR = "cache"
-CONFIDENCE_THRESHOLD = 0.7  # Typical values: 0.5 - 0.8
 
 print(f"Using cache directory: {CACHE_DIR}")
 print(f"Setting MLflow tracking URI: {MLFLOW_URI}")
@@ -62,11 +61,12 @@ def load_latest_model(model_name: str):
     model_versions = client.search_model_versions(f"name='{model_name}'")
     if not model_versions:
         raise ValueError(f"No versions found for model '{model_name}'")
-    
-    latest_version = max(model_versions, key=lambda x: x.version)
-    latest_version = latest_version.version
-    model_uri = f"models:/{model_name}/{latest_version}"
-    print(f"Loading model from URI: {model_uri}")
+
+    # Select the highest version number
+    latest_version_obj = max(model_versions, key=lambda x: int(x.version))
+    latest_version = latest_version_obj.version
+    print(f"Found {len(model_versions)} versions for model '{model_name}'. Loading the latest version: {latest_version}")
+    print(f"Loading model from URI: models:/{model_name}/{latest_version}")
 
     global cached_model
     global cached_model_version
@@ -87,6 +87,7 @@ def load_latest_model(model_name: str):
     max_retries = 3
     retry_delay = 2.0
     last_exception = None
+    model_uri = f"models:/{model_name}/{latest_version}"
     for attempt in range(1, max_retries + 1):
         try:
             # Load the model as sklearn model to ensure predict_proba is available
@@ -153,7 +154,7 @@ async def predict(payload: ImagePayload):
     if cached_model is None:
         raise HTTPException(status_code=500, detail="Model not loaded. Try hitting /reload endpoint.")
 
-    with mlflow.start_run(run_name="prediction_request", nested=True):
+    with mlflow.start_run(run_name="classifier_prediction", nested=True):
         mlflow.log_param("prediction_timestamp", str(np.datetime64('now')))
         
         image = payload.image
@@ -172,9 +173,6 @@ async def predict(payload: ImagePayload):
             prediction = prediction.tolist()
         if isinstance(prediction, list) and len(prediction) == 1:
             prediction = prediction[0]
-        # Apply confidence threshold
-        if confidence < CONFIDENCE_THRESHOLD:
-            prediction = "🤷"
         mlflow.log_param("prediction_result", prediction)
         mlflow.log_metric("prediction_confidence", confidence)
         mlflow.log_artifact(image_path, artifact_path="input_images")
@@ -189,7 +187,7 @@ async def reload_model():
     global cached_model_version
     try:
         cached_model, cached_model_version = load_latest_model(MODEL_NAME)
-        return {"status": "success", "message": "Model reloaded successfully"}
+        return {"status": "success", "message": f"Model reloaded successfully: {cached_model_version}"}
     except Exception as e:
         return {"status": "error", "message": f"Failed to reload model: {str(e)}"}
 

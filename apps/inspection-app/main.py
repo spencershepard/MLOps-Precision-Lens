@@ -1,5 +1,12 @@
-import dotenv
-dotenv.load_dotenv()
+from dotenv import load_dotenv
+import os
+script_path = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_path)
+print(os.getcwd())
+
+load_dotenv("../../secrets.env")
+load_dotenv("../../config.env")
+load_dotenv(override=True, verbose=True)
 
 from flask import Flask, request, jsonify
 import dash
@@ -14,9 +21,11 @@ import requests
 from s3dataset import s3data
 
 
+CLASSIFICATION_API_URL = os.getenv('CLASSIFICATION_API_URL', 'http://classifier.models.svc.cluster.local:8000')
+ANOMALY_API_URL = os.getenv('ANOMALY_API_URL', 'http://anomaly.models.svc.cluster.local:8000')
 
-CLASSIFICATION_API_URL = os.getenv('CLASSIFICATION_API_URL', 'http://classifier.models.svc.cluster.local:8000/predict')
-ANOMALY_API_URL = os.getenv('ANOMALY_API_URL', 'http://anomaly.models.svc.cluster.local:8000/predict')
+print(f"Using classification API URL: {CLASSIFICATION_API_URL}")
+print(f"Using anomaly API URL: {ANOMALY_API_URL}")
 
 # loads the "darkly" template and sets it as the default
 load_figure_template("darkly")
@@ -68,8 +77,8 @@ app.layout = html.Div([
                 ),
                 dbc.ButtonGroup([
                     dbc.Button("Classify", id="classify-btn", color="primary", className="me-2"),
-                    dbc.Button("Validate", id="validate-btn", color="success", className="me-2"),
-                    dbc.Button("Capture Frame", id="capture-btn", color="warning"),
+                    dbc.Button("Detect Anomalies", id="validate-btn", color="success", className="me-2"),
+                    dbc.Button("Capture Data", id="capture-btn", color="warning"),
                 ], className="d-flex justify-content-center mb-3"),
             ]),
             html.Div(id="capture-panel", style={"display": "none"}, children=[
@@ -212,11 +221,13 @@ def handle_panel_visibility(capture_clicks, discard_clicks, classify_clicks, val
                 return validation_panels + [dash.no_update, dash.no_update, validation_image, f"Validation Error: {str(e)}", model_text]
         
     elif triggered_id == "classify-btn":
+        print(f"Classify buttone pressed, checking if frame exists before sending to classification API at {CLASSIFICATION_API_URL}/predict")
         if captured_frame:
             print("Classifying capture")
+            print(f"Sending request to classification API at {CLASSIFICATION_API_URL}/predict")
             try:
                 resp = requests.post(
-                    CLASSIFICATION_API_URL,
+                    f"{CLASSIFICATION_API_URL}/predict",
                     json={"image": captured_frame}
                 )
                 response_data = resp.json()
@@ -224,9 +235,13 @@ def handle_panel_visibility(capture_clicks, discard_clicks, classify_clicks, val
                 
                 # Extract classification result
                 classification_text = f"Classification: {response_data.get('prediction', 'Unknown')}"
+                confidence = 0
                 if 'confidence' in response_data:
-                    classification_text += f" (Confidence: {response_data['confidence']:.2%})"
-                
+                    confidence = response_data['confidence']
+                    classification_text += f" (Confidence: {confidence:.2%})"
+
+                classification_text += confidence_emoji(confidence)
+
                 classification_panels = show_classification_result_panel()
                 return classification_panels + [captured_frame, classification_text, dash.no_update, dash.no_update, dash.no_update]
                 
@@ -295,6 +310,14 @@ def handle_data_uploads(normal_clicks, anomaly_clicks, selected_model):
     captured_frame = None
     return reset_to_live_feed()
 
+def confidence_emoji(confidence):
+    if confidence >= 0.8:
+        return " 🟢"
+    elif confidence >= 0.5:
+        return " 🟡"
+    else:
+        return " 🔴"
+
 @server.route('/capture-frame', methods=['POST'])
 def capture_frame():
     image = request.json.get('image')
@@ -306,6 +329,14 @@ def capture_frame():
     captured_frame = image
     
     return jsonify({"status": "received"})
+
+@server.route('/reload-classifier', methods=['GET'])
+def reload_classifier():
+    resp = requests.get(f"{CLASSIFICATION_API_URL}/reload")
+    if resp.status_code == 200:
+        return jsonify({"status": "classifier reloaded"})
+    else:
+        return jsonify({"error": "Failed to reload classifier"}), 500
 
 if __name__ == "__main__":
     if os.getenv('DASH_DEBUG', 'false').lower() == 'true':

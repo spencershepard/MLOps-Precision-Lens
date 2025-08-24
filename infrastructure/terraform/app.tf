@@ -109,6 +109,9 @@ resource "kubernetes_service" "pl-app" {
   metadata {
     name      = "pl-app"
     namespace = kubernetes_namespace.pl-app.metadata[0].name
+    annotations = {
+      "tailscale.com/expose" = "true"
+    }
   }
   spec {
     selector = {
