@@ -207,11 +207,26 @@ def handle_panel_visibility(capture_clicks, discard_clicks, classify_clicks, val
                 model_text = f"Selected Model: {selected_model}" if selected_model else "No model selected"
                 validation_text = "Validation result: Normal (placeholder)"
                 validation_image = captured_frame  # Store image for display
-                
+
+                if selected_model:
+                    print(f"Sending request to anomaly API at {ANOMALY_API_URL}/predict with model_name={selected_model}")
+                    resp = requests.post(
+                        f"{ANOMALY_API_URL}/predict?model_name={selected_model}",
+                        json={"image": captured_frame}
+                    )
+                    response_data = resp.json()
+                    print("Response from anomaly API:", response_data)
+                    # Show error detail if present
+                    if "detail" in response_data:
+                        validation_text = f"Error: {response_data['detail']}"
+                    else:
+                        validation_text = f"Anomaly Score: {response_data.get('score', 'Unknown')}"
+                else:
+                    print("No model selected for anomaly validation")
+
                 validation_panels = show_validation_result_panel()
                 captured_frame = None  # Clear the captured frame after validation
                 return validation_panels + [dash.no_update, dash.no_update, validation_image, validation_text, model_text]
-                
             except Exception as e:
                 print("Validation Error:", e)
                 model_text = f"Selected Model: {selected_model}" if selected_model else "No model selected"
