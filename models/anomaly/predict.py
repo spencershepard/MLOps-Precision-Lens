@@ -175,16 +175,23 @@ async def predict(payload: ImagePayload, model_name: str):
         mlflow.log_param("prediction_score", float(score) if score is not None else None)
         mlflow.log_artifact(image_path, artifact_path="input_images")
         # Save anomaly_map as image and log as artifact
+        anomaly_map_base64 = None
         if anomaly_map is not None:
             import matplotlib.pyplot as plt
             anomaly_map_path = os.path.join(CACHE_DIR, f"{safe_timestamp}_anomaly_map.jpg")
-            # Ensure anomaly_map is 2D for imsave
             anomaly_map_to_save = np.squeeze(anomaly_map)
             plt.imsave(anomaly_map_path, anomaly_map_to_save, cmap='jet')
             mlflow.log_artifact(anomaly_map_path, artifact_path="output_images")
+            # Encode anomaly_map image as base64
+            with open(anomaly_map_path, "rb") as img_f:
+                anomaly_map_bytes = img_f.read()
+                anomaly_map_base64 = "data:image/jpeg;base64," + base64.b64encode(anomaly_map_bytes).decode()
             os.remove(anomaly_map_path)
         os.remove(image_path)
-        return {"score": float(score) if score is not None else None}
+        return {
+            "score": float(score) if score is not None else None,
+            "anomaly_map": anomaly_map_base64
+        }
     
 @app.get("/reload")
 async def reload_model(model_name: str):

@@ -221,6 +221,9 @@ def handle_panel_visibility(capture_clicks, discard_clicks, classify_clicks, val
                         validation_text = f"Error: {response_data['detail']}"
                     else:
                         validation_text = f"Anomaly Score: {response_data.get('score', 'Unknown')}"
+                        # If anomaly_map image is present, display it
+                        if response_data.get("anomaly_map"):
+                            validation_image = response_data["anomaly_map"]
                 else:
                     print("No model selected for anomaly validation")
 
