@@ -14,6 +14,7 @@ import time
 import logging
 import pickle
 from datetime import datetime
+from anomalib.engine import Engine
 
 load_dotenv()
 app = FastAPI()
@@ -22,8 +23,19 @@ print("Starting anomaly detection prediction service...")
 MLFLOW_URI = os.getenv("MLFLOW_URI")
 if not MLFLOW_URI:
     raise ValueError("MLFLOW_URI environment variable is not set.")
-CACHE_DIR = "cache"
 SERVER_PORT = int(os.getenv("SERVER_PORT", 8000))
+
+# use persistent cache directory if available, otherwise use ephemeral container filesystem
+volume_mount_path = "/mnt/s3cache"
+ephemeral_cache_dir = "s3cache"
+if os.path.exists(volume_mount_path):
+    CACHE_DIR = volume_mount_path
+else:
+    CACHE_DIR = ephemeral_cache_dir
+    if not os.path.exists(CACHE_DIR):
+        os.makedirs(CACHE_DIR)
+
+print(f"Using cache directory: {CACHE_DIR}")
 
 print(f"Using cache directory: {CACHE_DIR}")
 print(f"Setting MLflow tracking URI: {MLFLOW_URI}")
@@ -106,22 +118,18 @@ def load_latest_model(model_name: str):
     raise RuntimeError(f"Failed to load model after {max_retries} attempts: {last_exception}")
 
 def predict_image(image_path, model):
-    img = imread(image_path)
-    img = resize(img, (512, 512), anti_aliasing=True)
-    if not img.shape == (512, 512, 3):
-        raise ValueError(f"Image shape {img.shape} does not match expected dimensions (512, 512, 3).")
-    img_tensor = np.transpose(img, (2, 0, 1))  # [C, H, W]
-    import torch
-    img_tensor = torch.tensor(img_tensor, dtype=torch.float32).unsqueeze(0)  # [1, C, H, W]
-    with torch.no_grad():
-        outputs = model(img_tensor)
-    # Assume model returns anomaly_map and score
-    anomaly_map = outputs.get("anomaly_map", None)
-    score = outputs.get("score", None)
+    # Use anomalib's Engine for prediction, similar to your notebook
+    engine = Engine()
+    predictions = engine.predict(model=model, data_path=image_path)
+    if not predictions or len(predictions) == 0:
+        raise ValueError("No predictions returned from anomalib Engine.")
+    pred = predictions[0]
+    score = float(pred.pred_score) if hasattr(pred, "pred_score") else None
+    anomaly_map = pred.anomaly_map.cpu().numpy() if hasattr(pred, "anomaly_map") else None
     # Save prediction for debugging
     import json
     with open("anomaly_prediction_result.json", "w") as f:
-        json.dump({"score": float(score) if score is not None else None}, f)
+        json.dump({"score": score}, f)
     return score, anomaly_map
 
 class ImagePayload(BaseModel):
@@ -163,8 +171,18 @@ async def predict(payload: ImagePayload, model_name: str):
         image_path = os.path.join(CACHE_DIR, image_name)
         image.save(image_path)
         score, anomaly_map = predict_image(image_path, cached_model)
+        print(f"Model: {cached_model_name} v{cached_model_version} - Prediction score: {score}")
         mlflow.log_param("prediction_score", float(score) if score is not None else None)
         mlflow.log_artifact(image_path, artifact_path="input_images")
+        # Save anomaly_map as image and log as artifact
+        if anomaly_map is not None:
+            import matplotlib.pyplot as plt
+            anomaly_map_path = os.path.join(CACHE_DIR, f"{safe_timestamp}_anomaly_map.jpg")
+            # Ensure anomaly_map is 2D for imsave
+            anomaly_map_to_save = np.squeeze(anomaly_map)
+            plt.imsave(anomaly_map_path, anomaly_map_to_save, cmap='jet')
+            mlflow.log_artifact(anomaly_map_path, artifact_path="output_images")
+            os.remove(anomaly_map_path)
         os.remove(image_path)
         return {"score": float(score) if score is not None else None}
     
