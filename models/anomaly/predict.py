@@ -214,3 +214,5 @@ if __name__ == "__main__":
     import uvicorn
     print(f"Starting FastAPI server on port {SERVER_PORT}...")
     uvicorn.run(app, host="0.0.0.0", port=SERVER_PORT)
+
+    
