@@ -1,4 +1,4 @@
-name: Build Classifier Image
+name: Build Anomaly Prediction Image
 on:
   workflow_dispatch:
   push:
