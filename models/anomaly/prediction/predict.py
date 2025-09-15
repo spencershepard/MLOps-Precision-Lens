@@ -4,8 +4,8 @@ from mlflow.tracking import MlflowClient
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import numpy as np
-from skimage.io import imread
-from skimage.transform import resize
+# from skimage.io import imread
+# from skimage.transform import resize
 from PIL import Image
 from io import BytesIO
 import base64
@@ -118,7 +118,6 @@ def load_latest_model(model_name: str):
     raise RuntimeError(f"Failed to load model after {max_retries} attempts: {last_exception}")
 
 def predict_image(image_path, model):
-    # Use anomalib's Engine for prediction, similar to your notebook
     engine = Engine()
     predictions = engine.predict(model=model, data_path=image_path)
     if not predictions or len(predictions) == 0:
@@ -178,20 +177,38 @@ async def predict(payload: ImagePayload, model_name: str):
         anomaly_map_base64 = None
         if anomaly_map is not None:
             import matplotlib.pyplot as plt
-            anomaly_map_path = os.path.join(CACHE_DIR, f"{safe_timestamp}_anomaly_map.jpg")
+            import cv2
             anomaly_map_to_save = np.squeeze(anomaly_map)
-            plt.imsave(anomaly_map_path, anomaly_map_to_save, cmap='jet')
+            # Normalize anomaly map for visualization
+            anomaly_map_norm = (anomaly_map_to_save - anomaly_map_to_save.min()) / (np.ptp(anomaly_map_to_save) + 1e-8)
+            # Upsample anomaly map to 512x512
+            anomaly_map_resized = cv2.resize(anomaly_map_norm, (512, 512), interpolation=cv2.INTER_LINEAR)
+            # Threshold to highlight only strong anomalies
+            threshold = 0.8  # You can tune this value
+            mask = anomaly_map_resized > threshold
+            # Use original image as array (already 512x512)
+            orig_img_np = np.array(image)
+            # Create heatmap
+            heatmap = cv2.applyColorMap((anomaly_map_resized * 255).astype(np.uint8), cv2.COLORMAP_JET)
+            # Apply mask to heatmap (set non-anomalous areas to transparent/black)
+            heatmap[~mask] = [0, 0, 0]
+            # Overlay heatmap on original image
+            overlay = cv2.addWeighted(orig_img_np, 0.6, heatmap, 0.4, 0)
+            anomaly_map_path = os.path.join(CACHE_DIR, f"{safe_timestamp}_overlay.jpg")
+            # Find contours on the mask and draw them on the image
+            contours, _ = cv2.findContours(mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cv2.drawContours(overlay, contours, -1, (255, 0, 0), 2)  # Blue contours
+            cv2.imwrite(anomaly_map_path, cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
             mlflow.log_artifact(anomaly_map_path, artifact_path="output_images")
-            # Encode anomaly_map image as base64
             with open(anomaly_map_path, "rb") as img_f:
                 anomaly_map_bytes = img_f.read()
                 anomaly_map_base64 = "data:image/jpeg;base64," + base64.b64encode(anomaly_map_bytes).decode()
             os.remove(anomaly_map_path)
         os.remove(image_path)
-        return {
-            "score": float(score) if score is not None else None,
-            "anomaly_map": anomaly_map_base64
-        }
+    return {
+        "score": float(score) if score is not None else None,
+        "anomaly_map": anomaly_map_base64
+    }
     
 @app.get("/reload")
 async def reload_model(model_name: str):
