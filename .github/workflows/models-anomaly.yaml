@@ -1,4 +1,4 @@
-name: Build Classifier Image
+name: Build Anomaly Prediction Image
 on:
   workflow_dispatch:
   push:
@@ -11,6 +11,6 @@ jobs:
     uses: ./.github/workflows/build-docker-image.yaml
     with:
       image_name: "anomaly"
-      dockerfile_path: "./models/anomaly/Dockerfile"
+      dockerfile_path: "./models/anomaly/prediction/Dockerfile"
       context_path: "./models/anomaly"
       image_tag_suffix: "anomaly"
