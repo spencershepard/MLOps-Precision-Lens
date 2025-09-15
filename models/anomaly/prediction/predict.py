@@ -4,8 +4,6 @@ from mlflow.tracking import MlflowClient
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import numpy as np
-# from skimage.io import imread
-# from skimage.transform import resize
 from PIL import Image
 from io import BytesIO
 import base64
