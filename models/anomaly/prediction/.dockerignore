@@ -1,0 +1,4 @@
+s3_cache
+.env
+__pycache__
+.venv
