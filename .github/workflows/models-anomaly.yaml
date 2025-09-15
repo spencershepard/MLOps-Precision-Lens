@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'models/anomaly/**'
+      - 'models/anomaly/prediction/**'
 
 jobs:
   build-anomaly-image:
@@ -12,5 +12,5 @@ jobs:
     with:
       image_name: "anomaly"
       dockerfile_path: "./models/anomaly/prediction/Dockerfile"
-      context_path: "./models/anomaly"
+      context_path: "./models/anomaly/prediction"
       image_tag_suffix: "anomaly"
