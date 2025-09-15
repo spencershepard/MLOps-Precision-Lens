@@ -196,3 +196,4 @@ models/anomaly/fastflow_prediction.png
 models/anomaly/fastflow_prediction.png
 models/classification/prediction_result.json
 models/anomaly/anomaly_prediction_result.json
+models/anomaly/prediction/anomaly_prediction_result.json
