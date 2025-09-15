@@ -189,7 +189,7 @@ pillow==11.3.0
 platformdirs==4.3.8
 plotly==6.3.0
 pprintpp==0.4.0
-precision_lens @ file:///C:/Github/MLOps-Precision-Lens/shared_libraries
+-e git+https://github.com/spencershepard/MLOps-Precision-Lens.git@main#egg=precision_lens&subdirectory=shared_libraries
 priority==2.0.0
 prometheus_client==0.22.1
 prompt_toolkit==3.0.51
