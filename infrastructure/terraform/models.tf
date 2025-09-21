@@ -170,7 +170,7 @@ resource "kubernetes_deployment_v1" "anomaly" {
 
         container {
           name  = "anomaly"
-          image = "ghcr.io/spencershepard/mlops-precision-lens/anomaly_detection:develop"
+          image = "ghcr.io/spencershepard/mlops-precision-lens/anomaly:develop"
           args = [ "python", "-u", "predict.py" ]
 
           volume_mount {
