@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime, timezone, timedelta
 from prefect import flow, get_run_logger
 from prefect.client import get_client
+from prefect.client.schemas.filters import FlowRunFilter, FlowRunFilterState 
 
 LATE_THRESHOLD_MINUTES = 60  # Runs older than this threshold will be canceled
 
@@ -10,12 +11,15 @@ async def cleanup_late_runs_flow():
     logger = get_run_logger()
     async with get_client() as client:
         # Find runs in 'Late' or 'Pending' state
+        # Use correct type instantiation for FlowRunFilterState
+        from prefect.client.schemas.filters import FlowRunFilterStateType
+        flow_run_filter = FlowRunFilter(
+            state=FlowRunFilterState(type=FlowRunFilterStateType(late=True, pending=True))
+        )
         runs = await client.read_flow_runs(
-            limit=500,
+            limit=200,
             sort="EXPECTED_START_TIME_ASC",
-            flow_run_filter={
-                "state": {"type": ["Late", "Pending"]},
-            }
+            flow_run_filter=flow_run_filter  # <-- use the filter object
         )
         now = datetime.now(timezone.utc)
         cancelled = 0
