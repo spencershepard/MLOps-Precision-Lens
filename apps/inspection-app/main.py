@@ -212,20 +212,27 @@ def handle_panel_visibility(capture_clicks, discard_clicks, classify_clicks, val
 
                 if selected_model:
                     print(f"Sending request to anomaly API at {ANOMALY_API_URL}/predict with model_name={selected_model}")
-                    resp = requests.post(
-                        f"{ANOMALY_API_URL}/predict?model_name={selected_model}",
-                        json={"image": captured_frame}
-                    )
-                    response_data = resp.json()
-                    print("Response from anomaly API:", response_data)
-                    # Show error detail if present
-                    if "detail" in response_data:
-                        validation_text = f"Error: {response_data['detail']}"
-                    else:
-                        validation_text = f"Anomaly Score: {response_data.get('score', 'Unknown')}"
-                        # If anomaly_map image is present, display it
-                        if response_data.get("anomaly_map"):
-                            validation_image = response_data["anomaly_map"]
+                    try:
+                        resp = requests.post(
+                            f"{ANOMALY_API_URL}/predict?model_name={selected_model}",
+                            json={"image": captured_frame}
+                        )
+                        print(f"Anomaly API response status: {resp.status_code}")
+                        if resp.status_code != 200:
+                            print("Error response from anomaly API:", resp.text)
+                            validation_text = f"HTTP Error {resp.status_code}: {resp.text}"
+                        else:
+                            response_data = resp.json()
+                            print("Response from anomaly API:", response_data)
+                            if "detail" in response_data:
+                                validation_text = f"Error: {response_data['detail']}"
+                            else:
+                                validation_text = f"Anomaly Score: {response_data.get('score', 'Unknown')}"
+                                if response_data.get("anomaly_map"):
+                                    validation_image = response_data["anomaly_map"]
+                    except Exception as e:
+                        print("Exception during anomaly API request:", e)
+                        validation_text = f"Exception: {str(e)}"
                 else:
                     print("No model selected for anomaly validation")
 
@@ -239,32 +246,38 @@ def handle_panel_visibility(capture_clicks, discard_clicks, classify_clicks, val
                 validation_panels = show_validation_result_panel()
                 captured_frame = None
                 return validation_panels + [dash.no_update, dash.no_update, validation_image, f"Validation Error: {str(e)}", model_text]
-        
+
     elif triggered_id == "classify-btn":
-        print(f"Classify buttone pressed, checking if frame exists before sending to classification API at {CLASSIFICATION_API_URL}/predict")
+        print(f"Classify button pressed, checking if frame exists before sending to classification API at {CLASSIFICATION_API_URL}/predict")
         if captured_frame:
             print("Classifying capture")
             print(f"Sending request to classification API at {CLASSIFICATION_API_URL}/predict")
             try:
-                resp = requests.post(
-                    f"{CLASSIFICATION_API_URL}/predict",
-                    json={"image": captured_frame}
-                )
-                response_data = resp.json()
-                print("Response from classification API:", response_data)
-                
-                # Extract classification result
-                classification_text = f"Classification: {response_data.get('prediction', 'Unknown')}"
-                confidence = 0
-                if 'confidence' in response_data:
-                    confidence = response_data['confidence']
-                    classification_text += f" (Confidence: {confidence:.2%})"
-
-                classification_text += confidence_emoji(confidence)
+                try:
+                    resp = requests.post(
+                        f"{CLASSIFICATION_API_URL}/predict",
+                        json={"image": captured_frame}
+                    )
+                    print(f"Classification API response status: {resp.status_code}")
+                    if resp.status_code != 200:
+                        print("Error response from classification API:", resp.text)
+                        classification_text = f"HTTP Error {resp.status_code}: {resp.text}"
+                    else:
+                        response_data = resp.json()
+                        print("Response from classification API:", response_data)
+                        classification_text = f"Classification: {response_data.get('prediction', 'Unknown')}"
+                        confidence = 0
+                        if 'confidence' in response_data:
+                            confidence = response_data['confidence']
+                            classification_text += f" (Confidence: {confidence:.2%})"
+                        classification_text += confidence_emoji(confidence)
+                except Exception as e:
+                    print("Exception during classification API request:", e)
+                    classification_text = f"Exception: {str(e)}"
 
                 classification_panels = show_classification_result_panel()
                 return classification_panels + [captured_frame, classification_text, dash.no_update, dash.no_update, dash.no_update]
-                
+
             except Exception as e:
                 print("Error:", e)
                 classification_panels = show_classification_result_panel()
@@ -352,11 +365,17 @@ def capture_frame():
 
 @server.route('/reload-classifier', methods=['GET'])
 def reload_classifier():
-    resp = requests.get(f"{CLASSIFICATION_API_URL}/reload")
-    if resp.status_code == 200:
-        return jsonify({"status": "classifier reloaded"})
-    else:
-        return jsonify({"error": "Failed to reload classifier"}), 500
+    try:
+        resp = requests.get(f"{CLASSIFICATION_API_URL}/reload")
+        print(f"Reload classifier response status: {resp.status_code}")
+        print(f"Reload classifier response body: {resp.text}")
+        if resp.status_code == 200:
+            return jsonify({"status": "classifier reloaded", "response": resp.text})
+        else:
+            return jsonify({"error": f"Failed to reload classifier: {resp.text}"}), 500
+    except Exception as e:
+        print("Exception during reload classifier:", e)
+        return jsonify({"error": f"Exception: {str(e)}"}), 500
 
 if __name__ == "__main__":
     if os.getenv('DASH_DEBUG', 'false').lower() == 'true':
