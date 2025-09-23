@@ -1,11 +1,13 @@
 from dotenv import load_dotenv
 import os
-script_path = os.path.dirname(os.path.abspath(__file__))
+from pathlib import Path
+
+script_path = Path(__file__).resolve().parent
 os.chdir(script_path)
 print(os.getcwd())
 
-load_dotenv("../../secrets.env")
-load_dotenv("../../config.env")
+load_dotenv(script_path / "../../secrets.env")
+load_dotenv(script_path / "../../config.env")
 load_dotenv(override=True, verbose=True)
 
 from flask import Flask, request, jsonify
