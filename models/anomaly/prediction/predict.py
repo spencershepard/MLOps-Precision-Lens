@@ -13,6 +13,14 @@ import logging
 import pickle
 from datetime import datetime
 from anomalib.engine import Engine
+from pathlib import Path
+import sys
+
+# Patch WindowsPath to PosixPath if not on Windows
+if os.name != "nt":
+    import pathlib
+    pathlib.WindowsPath = pathlib.PosixPath
+    print("Patched pathlib.WindowsPath to PosixPath for non-Windows OS.")
 
 load_dotenv()
 app = FastAPI()
@@ -230,4 +238,3 @@ if __name__ == "__main__":
     print(f"Starting FastAPI server on port {SERVER_PORT}...")
     uvicorn.run(app, host="0.0.0.0", port=SERVER_PORT)
 
-    
