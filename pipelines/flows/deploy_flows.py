@@ -20,7 +20,6 @@ def deploy_classifier_training_flow():
         name="s3-triggered-classifier-training",
         work_pool_name="my-pool",
         image="ghcr.io/spencershepard/mlops-precision-lens/prefect:develop",
-        cron="*/2 * * * *",  # Run every 2 mins
         build=False,  # If true, Prefect will build it's own image (slower)
         tags=["s3", "monitoring", "ml", "classifier-training"],
         concurrency_limit=1,
@@ -38,7 +37,6 @@ def deploy_cleanup_late_runs_flow():
         name="cleanup-late-prefect-runs",
         work_pool_name="my-pool",
         image="ghcr.io/spencershepard/mlops-precision-lens/prefect:develop",
-        cron="0 * * * *",  # Run every hour
         build=False,
         tags=["cleanup", "prefect", "maintenance"],
         concurrency_limit=1,
