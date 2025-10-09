@@ -9,8 +9,9 @@ if len(sys.argv) > 1:
 print(f"Using PREFECT_API_URL: {os.environ.get('PREFECT_API_URL', 'Not set')}")
 
 # Load Prefect modules after setting PREFECT_API_URL
+from prefect import flow, get_run_logger
 from train_classifier_flow import s3_monitor_flow
-from cleanup_late_runs_flow import cleanup_late_runs_flow  # <-- Add import
+from cleanup_late_runs_flow import cleanup_late_runs_flow
 
 def deploy_classifier_training_flow():
     """Deploy the S3 monitor training flow to Prefect server"""
@@ -25,35 +26,19 @@ def deploy_classifier_training_flow():
         concurrency_limit=1,
         description="Monitors S3 for new data and triggers ML classifier training jobs"
     )
-    
-    print(f"✅ Deployment created successfully: {deployment}")
     return deployment
 
-def deploy_cleanup_late_runs_flow():
-    """Deploy the cleanup late Prefect runs flow to Prefect server"""
-    print("Deploying cleanup late Prefect runs flow...")
 
-    deployment = cleanup_late_runs_flow.deploy(
-        name="cleanup-late-prefect-runs",
-        work_pool_name="my-pool",
-        image="ghcr.io/spencershepard/mlops-precision-lens/prefect:develop",
-        build=False,
-        tags=["cleanup", "prefect", "maintenance"],
-        concurrency_limit=1,
-        description="Cancels stuck or late Prefect runs older than threshold"
-    )
-
-    print(f"✅ Deployment created successfully: {deployment}")
-    return deployment
-
-def main():
+@flow(name="deploy-all-flows", log_prints=True)
+def deploy_all_flows_flow():
+    logger = get_run_logger()
     try:
-        deploy_classifier_training_flow()
-        deploy_cleanup_late_runs_flow()  # <-- Add this line
-        print("🚀 All flows deployed successfully!")
+        deployment1 = deploy_classifier_training_flow()
+        logger.info(f"✅ Classifier training flow deployed: {deployment1}")
+        logger.info("🚀 All flows deployed successfully!")
     except Exception as e:
-        print(f"❌ Deployment failed: {e}")
+        logger.error(f"❌ Deployment failed: {e}")
         raise
 
 if __name__ == "__main__":
-    main()
+    deploy_all_flows_flow()
