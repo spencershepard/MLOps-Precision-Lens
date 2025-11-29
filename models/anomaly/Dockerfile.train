@@ -1,0 +1,63 @@
+# Use Python 3.12 as SentencePiece is not compatible with Python 3.13 (per README)
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install system dependencies for OpenCV, CUDA support, and other libraries
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    libgl1 \
+    libglu1-mesa \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements file for better layer caching
+COPY requirements.txt .
+
+# Filter out Windows-specific packages
+RUN grep -v "pywin32\|pywinpty\|torch==" requirements.txt > requirements-docker.txt
+
+# Install base requirements
+RUN pip config set global.timeout 1000 && \
+    pip install --no-cache-dir -r requirements-docker.txt
+
+# Uninstall packages we want to reinstall with specific versions
+RUN pip uninstall -y anomalib torch || true
+
+# Install PyTorch with CUDA support
+RUN pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu128
+
+# Install anomalib with full dependencies
+RUN pip install anomalib[full]
+
+# Install papermill and notebook dependencies
+RUN pip install papermill ipykernel nbformat
+
+# Copy notebook and startup script
+COPY fastflow.ipynb .
+COPY start.sh .
+RUN chmod +x start.sh
+
+# Create directory for output
+RUN mkdir -p /app/output
+
+# Set non-sensitive environment variables with defaults
+ENV ENVIRONMENT="PRODUCTION" \
+    CATEGORY="XRFC-PCB-Quality" \
+    CACHE_DIRECTORY="s3cache" \
+    MAX_EPOCHS="100" \
+    PYTHONUNBUFFERED=1
+
+# Note: The following sensitive environment variables should be provided at runtime:
+# - BUCKET_NAME
+# - MLFLOW_URI
+# - AWS_ACCESS_KEY_ID
+# - AWS_SECRET_ACCESS_KEY
+# - AWS_REGION_NAME
+
+# Use the startup script to validate environment and run papermill
+CMD ["./start.sh"]
