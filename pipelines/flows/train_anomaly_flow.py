@@ -27,6 +27,7 @@ print(f"PREFECT_API_URL setting: {PREFECT_API_URL.value()}")
 
 from prefect_aws import AwsCredentials
 from prefect_aws.s3 import S3Bucket
+from k8s_utils import sanitize_k8s_name
 
 aws_credentials_block = AwsCredentials.load("my-aws")
 s3_bucket = S3Bucket.load("my-s3")
@@ -51,19 +52,6 @@ if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
     raise ValueError("AWS credentials are not set in environment variables.")
 if not BUCKET_NAME:
     raise ValueError("S3 bucket name is not set in environment variables.")
-
-def sanitize_k8s_name(name: str, max_length=63):
-    name = name.lower()
-    # Replace invalid characters with '-'
-    name = re.sub(r'[^a-z0-9\-\.]', '-', name)
-    # Ensure starts/ends with alphanumeric
-    name = re.sub(r'^[^a-z0-9]+', '', name)
-    name = re.sub(r'[^a-z0-9]+$', '', name)
-    # Truncate to max_length
-    name = name[:max_length]
-    # Ensure ends with alphanumeric after truncation
-    name = re.sub(r'[^a-z0-9]+$', '', name)
-    return name
 
 @task
 def trigger_k8s_job():
