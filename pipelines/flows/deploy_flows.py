@@ -28,6 +28,7 @@ def deploy_classifier_training_flow():
         work_pool_name="my-pool",
         image="ghcr.io/spencershepard/mlops-precision-lens/prefect:develop",
         build=False,  # If true, Prefect will build it's own image (slower)
+        job_variables={"image_pull_policy": "Always"},  # Always pull latest image from registry
         tags=["s3", "monitoring", "ml", "classifier-training"],
         concurrency_limit=1,
         description="Monitors S3 for new data and triggers ML classifier training jobs",
@@ -46,6 +47,7 @@ def deploy_anomaly_training_flow():
         work_pool_name="my-pool",
         image="ghcr.io/spencershepard/mlops-precision-lens/prefect:develop",
         build=False,  # If true, Prefect will build it's own image (slower)
+        job_variables={"image_pull_policy": "Always"},  # Always pull latest image from registry
         tags=["ml", "anomaly-training", "manual"],
         concurrency_limit=1,
         description="Manually triggered ML anomaly detection training jobs",
@@ -147,6 +149,7 @@ def deploy_deployment_trigger_flow():
         work_pool_name="my-pool",
         image="ghcr.io/spencershepard/mlops-precision-lens/prefect:develop",
         build=False,
+        job_variables={"image_pull_policy": "Always"},  # Always pull latest image from registry
         tags=["deployment", "admin", "manual"],
         concurrency_limit=1,
         description="Trigger K8s job to pull latest Prefect image and redeploy all flows",
@@ -159,13 +162,9 @@ if __name__ == "__main__":
     # First run: deploy all flows
     deploy_all_flows_flow()
     
-    # Then deploy the deployment trigger flow so it can be used from UI (only in K8s)
-    if not IS_LOCAL_DEV:
-        print("\n" + "="*60)
-        print("Now deploying the deployment trigger flow...")
-        print("="*60)
-        deploy_deployment_trigger_flow()
-        print("✅ Deployment trigger flow is now available in Prefect UI!")
-        print("   Trigger 'redeploy-with-latest-image' to pull latest Prefect image and redeploy.")
-    else:
-        print("\n⏭️  Skipping K8s deployment trigger flow in local development mode.")
+    print("\n" + "="*60)
+    print("Now deploying the deployment trigger flow...")
+    print("="*60)
+    deploy_deployment_trigger_flow()
+    print("✅ Deployment trigger flow is now available in Prefect UI!")
+    print("   Trigger 'redeploy-with-latest-image' to pull latest Prefect image and redeploy.")
