@@ -78,7 +78,7 @@ def trigger_k8s_job():
                     "containers": [
                         {
                             "name": "anomaly-trainer",
-                            "image": "ghcr.io/spencershepard/mlops-precision-lens/anomaly:develop",
+                            "image": "ghcr.io/spencershepard/mlops-precision-lens/anomaly-train:develop",
                             "env": [
                                 {
                                     "name": "AWS_ACCESS_KEY_ID",
