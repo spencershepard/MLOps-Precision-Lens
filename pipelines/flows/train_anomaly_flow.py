@@ -39,7 +39,7 @@ def _to_str(val):
 AWS_ACCESS_KEY_ID = _to_str(aws_credentials_block.aws_access_key_id)
 AWS_SECRET_ACCESS_KEY = _to_str(aws_credentials_block.aws_secret_access_key)
 BUCKET_NAME = s3_bucket.bucket_name
-AWS_REGION = aws_credentials_block.region_name
+AWS_REGION = _to_str(aws_credentials_block.region_name) if aws_credentials_block.region_name else "us-east-1"
 
 MLFLOW_URI = Variable.get("MLFLOW_URI", default="http://mlflow.mlflow.svc.cluster.local:80")
 ANOMALY_CATEGORY = Variable.get("anomaly_category", default="XRFC-PCB-Quality")
@@ -142,15 +142,21 @@ def trigger_k8s_job():
     )
 
     run = k8s_job.trigger()
-    run.wait_for_completion()
-    job_name = job_spec["metadata"]["name"]
-    logger.info(f"job_name: {job_name}")
-    # Fetch and log job results (logs from pods)
+    
     try:
+        run.wait_for_completion()
         result = run.fetch_result()
-        logger.info(f"Kubernetes job logs: {result}")
+        logger.info(f"Kubernetes job completed successfully")
+        logger.info(f"Job logs:\n{result}")
     except Exception as e:
-        logger.error(f"Failed to fetch job logs: {e}")
+        # Job failed - try to get logs anyway
+        logger.error(f"Job failed with error: {e}")
+        try:
+            result = run.fetch_result()
+            logger.error(f"Job failure logs:\n{result}")
+        except Exception as log_error:
+            logger.error(f"Could not fetch failure logs: {log_error}")
+        raise  # Re-raise the original exception to mark the task as failed
 
 
 @flow(name="train-anomaly-flow", log_prints=True)
