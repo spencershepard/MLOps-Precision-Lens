@@ -20,19 +20,15 @@ TIMESTAMP=$(date +%Y%m%d%H%M%S)
 OUTPUT_FILE="/app/output/output-${CATEGORY}-${TIMESTAMP}.ipynb"
 
 echo "Starting papermill execution..."
-echo "Parameters:"
-echo "- bucket_name: $BUCKET_NAME"
-echo "- category: $CATEGORY"
-echo "- cache_directory: $CACHE_DIRECTORY"
-echo "- max_epochs: $MAX_EPOCHS"
+echo "Environment variables:"
+echo "- BUCKET_NAME: $BUCKET_NAME"
+echo "- CATEGORY: $CATEGORY"
+echo "- CACHE_DIRECTORY: $CACHE_DIRECTORY"
+echo "- MAX_EPOCHS: $MAX_EPOCHS"
 echo "Output will be saved to: $OUTPUT_FILE"
 
-# Execute the notebook with papermill
-papermill fastflow.ipynb "$OUTPUT_FILE" \
-    -p bucket_name "$BUCKET_NAME" \
-    -p category "$CATEGORY" \
-    -p cache_directory "$CACHE_DIRECTORY" \
-    -p max_epochs "$MAX_EPOCHS"
+# Execute the notebook with papermill (no parameters needed - using environment variables)
+papermill fastflow.ipynb "$OUTPUT_FILE"
 
 # Check papermill exit status
 if [ $? -eq 0 ]; then

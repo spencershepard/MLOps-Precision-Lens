@@ -71,6 +71,7 @@ def trigger_k8s_job():
         "kind": "Job",
         "metadata": {"name": job_name},
         "spec": {
+            "backoffLimit": 0,
             "template": {
                 "metadata": {"labels": {"job": job_name}},
                 "spec": {
