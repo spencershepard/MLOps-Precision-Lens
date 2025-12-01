@@ -80,6 +80,14 @@ def trigger_k8s_job():
                         {
                             "name": "anomaly-trainer",
                             "image": "ghcr.io/spencershepard/mlops-precision-lens/anomaly-train:develop",
+                            "resources": {
+                                "limits": {
+                                    "nvidia.com/gpu": "1"
+                                },
+                                "requests": {
+                                    "nvidia.com/gpu": "1"
+                                }
+                            },
                             "env": [
                                 {
                                     "name": "AWS_ACCESS_KEY_ID",

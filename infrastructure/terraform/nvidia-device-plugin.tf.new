@@ -1,0 +1,78 @@
+# NVIDIA Device Plugin for GPU support in Kubernetes
+# This DaemonSet enables GPU access for pods that request nvidia.com/gpu resources
+
+resource "kubernetes_daemon_set_v1" "nvidia_device_plugin" {
+  metadata {
+    name      = "nvidia-device-plugin-daemonset"
+    namespace = "kube-system"
+  }
+
+  spec {
+    selector {
+      match_labels = {
+        name = "nvidia-device-plugin-ds"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          name = "nvidia-device-plugin-ds"
+        }
+      }
+
+      spec {
+        # Tolerate the control-plane taint for Docker Desktop
+        toleration {
+          key      = "node-role.kubernetes.io/control-plane"
+          operator = "Exists"
+          effect   = "NoSchedule"
+        }
+
+        toleration {
+          key      = "node-role.kubernetes.io/master"
+          operator = "Exists"
+          effect   = "NoSchedule"
+        }
+
+        # Priority to ensure GPU plugin runs before GPU workloads
+        priority_class_name = "system-node-critical"
+
+        container {
+          name  = "nvidia-device-plugin-ctr"
+          image = "nvcr.io/nvidia/k8s-device-plugin:v0.17.0"
+
+          env {
+            name  = "FAIL_ON_INIT_ERROR"
+            value = "false"
+          }
+
+          security_context {
+            allow_privilege_escalation = false
+            capabilities {
+              drop = ["ALL"]
+            }
+          }
+
+          volume_mount {
+            name       = "device-plugin"
+            mount_path = "/var/lib/kubelet/device-plugins"
+          }
+        }
+
+        volume {
+          name = "device-plugin"
+          host_path {
+            path = "/var/lib/kubelet/device-plugins"
+          }
+        }
+      }
+    }
+  }
+}
+
+# Output to verify GPU availability
+output "nvidia_device_plugin_status" {
+  value = "NVIDIA device plugin deployed. Check GPU availability with: kubectl get nodes -o json | jq '.items[].status.capacity'"
+  depends_on = [kubernetes_daemon_set_v1.nvidia_device_plugin]
+}

@@ -12,8 +12,17 @@ done
 
 echo "Environment validation passed"
 
-# Check if CUDA is available (informational only)
-python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
+# Check if CUDA is available and fail if not
+echo "Checking CUDA availability..."
+if ! python -c "import torch; import sys; sys.exit(0 if torch.cuda.is_available() else 1)"; then
+    echo "Error: CUDA is not available. GPU training requires CUDA."
+    echo "Please ensure:"
+    echo "  1. NVIDIA device plugin is deployed in Kubernetes"
+    echo "  2. Pod has nvidia.com/gpu resource requests"
+    echo "  3. NVIDIA drivers are installed on the host"
+    exit 1
+fi
+echo "CUDA is available"
 
 # Create output filename with timestamp
 TIMESTAMP=$(date +%Y%m%d%H%M%S)
@@ -27,8 +36,8 @@ echo "- CACHE_DIRECTORY: $CACHE_DIRECTORY"
 echo "- MAX_EPOCHS: $MAX_EPOCHS"
 echo "Output will be saved to: $OUTPUT_FILE"
 
-# Execute the notebook with papermill (no parameters needed - using environment variables)
-papermill fastflow.ipynb "$OUTPUT_FILE"
+# Execute the notebook with papermill (using environment variables, no parameters)
+papermill fastflow.ipynb "$OUTPUT_FILE" --no-input
 
 # Check papermill exit status
 if [ $? -eq 0 ]; then
